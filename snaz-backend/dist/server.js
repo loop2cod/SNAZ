@@ -38,9 +38,13 @@ app.get('/api/health', (req, res) => {
 const driverRoutes_1 = __importDefault(require("./routes/driverRoutes"));
 const foodCategoryRoutes_1 = __importDefault(require("./routes/foodCategoryRoutes"));
 const customerRoutes_1 = __importDefault(require("./routes/customerRoutes"));
+const dailyOrderRoutes_1 = __importDefault(require("./routes/dailyOrderRoutes"));
+const analyticsRoutes_1 = __importDefault(require("./routes/analyticsRoutes"));
 app.use('/api/drivers', driverRoutes_1.default);
 app.use('/api/food-categories', foodCategoryRoutes_1.default);
 app.use('/api/customers', customerRoutes_1.default);
+app.use('/api/daily-orders', dailyOrderRoutes_1.default);
+app.use('/api/analytics', analyticsRoutes_1.default);
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
