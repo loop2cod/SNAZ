@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { DinnerOrdersTable } from "@/components/orders/DinnerOrdersTable";
 import { apiClient, DailyOrder } from "@/lib/api";
+import { ExcelExporter } from "@/lib/excel-export";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Save } from "lucide-react";
 import { parseBagFormat } from "@/lib/bagFormatParser";
 
@@ -13,6 +15,8 @@ interface DinnerOrderRow {
   orderId: string;
   orderItemId: string;
   customerId: string;
+  driverId: string;
+  categoryId: string;
   customerName: string;
   categoryName: string;
   driverName: string;
@@ -29,6 +33,9 @@ export default function DinnerOrdersPage() {
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
   const [noOrders, setNoOrders] = useState(false);
+  const [rawOrders, setRawOrders] = useState<DailyOrder[]>([]);
+  const [filterDriverId, setFilterDriverId] = useState<string>('all');
+  const [filterCategoryId, setFilterCategoryId] = useState<string>('all');
 
   const loadOrders = async () => {
     setLoading(true);
@@ -41,17 +48,21 @@ export default function DinnerOrdersPage() {
         setNoOrders(false);
         const rows: DinnerOrderRow[] = [];
         orders.forEach((o) => {
-          const driverName = typeof o.driverId === 'object' ? (o.driverId as any).name : 'Unknown';
+          const drObj = o.driverId as any;
+          const driverName = typeof o.driverId === 'object' ? drObj.name : 'Unknown';
           o.orders.forEach((it: any) => {
             if (it.mealType !== 'dinner') return;
             const customerName = it.customerId && typeof it.customerId === 'object' ? (it.customerId as any).name : 'Unknown';
-            const categoryName = it.categoryId && typeof it.categoryId === 'object' ? (it.categoryId as any).name : 'Unknown';
+            const catObj = it.categoryId as any;
+            const categoryName = it.categoryId && typeof it.categoryId === 'object' ? catObj.name : 'Unknown';
             rows.push({
               orderId: o._id,
               orderItemId: it._id,
               customerId: typeof it.customerId === 'object' ? it.customerId._id : it.customerId,
               customerName,
+              driverId: typeof o.driverId === 'object' ? drObj._id : (o.driverId as any),
               categoryName,
+              categoryId: typeof it.categoryId === 'object' ? catObj._id : it.categoryId,
               driverName,
               bagFormat: it.bagFormat,
               nonVegCount: it.nonVegCount,
@@ -63,11 +74,31 @@ export default function DinnerOrdersPage() {
         rows.sort((a, b) => a.customerName.localeCompare(b.customerName));
         setData(rows);
       }
+      setRawOrders(orders || []);
     } catch (e) {
       toast.error('Failed to load dinner orders');
     } finally {
       setLoading(false);
       setHasChanges(false);
+    }
+  };
+
+  const handleExport = () => {
+    try {
+      const filtered = (rawOrders || []).map((o) => {
+        const drId = typeof o.driverId === 'object' ? (o.driverId as any)._id : (o.driverId as any);
+        const orders = (o.orders as any[]).filter((it) => {
+          const catId = typeof it.categoryId === 'object' ? (it.categoryId as any)._id : it.categoryId;
+          const okMeal = it.mealType === 'dinner';
+          const okDriver = filterDriverId === 'all' || filterDriverId === drId;
+          const okCat = filterCategoryId === 'all' || filterCategoryId === catId;
+          return okMeal && okDriver && okCat;
+        });
+        return { ...o, orders };
+      }).filter((o) => (o as any).orders.length > 0) as any as DailyOrder[];
+      ExcelExporter.exportDailyOrders(filtered, `daily-orders-dinner-${currentDate}.xlsx`);
+    } catch (e) {
+      toast.error('Failed to export Excel');
     }
   };
 
@@ -137,6 +168,16 @@ export default function DinnerOrdersPage() {
     }
   };
 
+  const uniqueDrivers = Array.from(
+    new Map(data.map((r) => [(r as any).driverId, { id: (r as any).driverId, name: r.driverName }])).values()
+  );
+  const uniqueCategories = Array.from(
+    new Map(data.map((r) => [(r as any).categoryId, { id: (r as any).categoryId, name: r.categoryName }])).values()
+  );
+  const filteredData = data.filter(
+    (r: any) => (!filterDriverId || r.driverId === filterDriverId) && (!filterCategoryId || r.categoryId === filterCategoryId)
+  );
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -145,7 +186,7 @@ export default function DinnerOrdersPage() {
             <h1 className="text-3xl font-bold tracking-tight">Dinner Orders</h1>
             <p className="text-muted-foreground">Manage daily dinner bag formats</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
             <Button variant="outline" size="sm" onClick={handlePreviousDay}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -155,6 +196,28 @@ export default function DinnerOrdersPage() {
             <Button variant="outline" size="sm" onClick={handleNextDay}>
               <ChevronRight className="h-4 w-4" />
             </Button>
+            <Select value={filterDriverId} onValueChange={setFilterDriverId}>
+              <SelectTrigger className="h-8 w-[160px] text-xs">
+                <SelectValue placeholder="All Drivers" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Drivers</SelectItem>
+                {uniqueDrivers.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterCategoryId} onValueChange={setFilterCategoryId}>
+              <SelectTrigger className="h-8 w-[180px] text-xs">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {uniqueCategories.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button size="sm" onClick={handleSaveChanges} disabled={!hasChanges || saving}>
               <Save className="h-4 w-4 mr-2" />
               {saving ? 'Saving...' : 'Save Changes'}
@@ -169,7 +232,7 @@ export default function DinnerOrdersPage() {
           </div>
         ) : (
           <DinnerOrdersTable
-            data={data.map(r => ({
+            data={filteredData.map((r: any) => ({
               customerId: r.customerId,
               customerName: r.customerName,
               categoryName: r.categoryName,
@@ -181,6 +244,7 @@ export default function DinnerOrdersPage() {
             }))}
             loading={loading}
             onOrderChange={handleOrderChange}
+            onExport={handleExport}
           />
         )}
       </div>
