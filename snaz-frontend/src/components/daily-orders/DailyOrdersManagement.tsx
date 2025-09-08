@@ -200,10 +200,7 @@ export default function DailyOrdersManagement() {
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Daily Orders Management</CardTitle>
-              <CardDescription>Generate and manage daily food orders by driver and customer</CardDescription>
-            </div>
+            <CardTitle>Order Controls</CardTitle>
             <div className="flex gap-2">
               <Button variant="outline" onClick={handleExportOrders}>
                 <Download className="w-4 h-4 mr-2" />

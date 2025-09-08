@@ -94,14 +94,10 @@ export default function FoodCategoriesManagement() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Food Categories Management</CardTitle>
-              <CardDescription>Manage food categories and their pricing tiers</CardDescription>
-            </div>
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle>All Food Categories</CardTitle>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={() => resetForm()}>
@@ -219,6 +215,5 @@ export default function FoodCategoriesManagement() {
           )}
         </CardContent>
       </Card>
-    </div>
   );
 }

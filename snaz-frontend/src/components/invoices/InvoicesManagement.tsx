@@ -71,14 +71,10 @@ export default function InvoicesManagement() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Invoices Management</CardTitle>
-              <CardDescription>Generate and manage customer invoices</CardDescription>
-            </div>
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle>All Invoices</CardTitle>
             <Button onClick={handleGenerateInvoice}>
               <Plus className="w-4 h-4 mr-2" />
               Generate Invoice
@@ -209,6 +205,5 @@ export default function InvoicesManagement() {
           )}
         </CardContent>
       </Card>
-    </div>
   );
 }

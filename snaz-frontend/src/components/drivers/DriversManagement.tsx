@@ -109,14 +109,10 @@ export default function DriversManagement() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Drivers Management</CardTitle>
-              <CardDescription>Manage delivery drivers and their routes</CardDescription>
-            </div>
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle>All Drivers</CardTitle>
             <div className="flex gap-2">
               <Button variant="outline" onClick={handleExportDrivers}>
                 <Download className="w-4 h-4 mr-2" />
@@ -260,6 +256,5 @@ export default function DriversManagement() {
           )}
         </CardContent>
       </Card>
-    </div>
   );
 }

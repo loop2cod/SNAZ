@@ -86,13 +86,10 @@ export default function AnalyticsDashboard() {
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart className="w-5 h-5" />
-                Analytics Dashboard
-              </CardTitle>
-              <CardDescription>Performance insights and key metrics</CardDescription>
-            </div>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart className="w-5 h-5" />
+              Analytics Controls
+            </CardTitle>
             <Button onClick={handleExportData} variant="outline">
               <Download className="w-4 h-4 mr-2" />
               Export Data
