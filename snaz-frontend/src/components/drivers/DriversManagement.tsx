@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit, Trash2, Search, Filter } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Filter, Download } from "lucide-react";
 import { apiClient, Driver } from "@/lib/api";
+import { ExcelExporter } from "@/lib/excel-export";
 import { toast } from "sonner";
 
 export default function DriversManagement() {
@@ -98,6 +99,15 @@ export default function DriversManagement() {
     setIsDialogOpen(false);
   };
 
+  const handleExportDrivers = () => {
+    try {
+      ExcelExporter.exportDrivers(filteredDrivers);
+      toast.success("Drivers data exported successfully");
+    } catch (error) {
+      toast.error("Failed to export drivers data");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -107,14 +117,19 @@ export default function DriversManagement() {
               <CardTitle>Drivers Management</CardTitle>
               <CardDescription>Manage delivery drivers and their routes</CardDescription>
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={() => resetForm()}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Driver
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleExportDrivers}>
+                <Download className="w-4 h-4 mr-2" />
+                Export Excel
+              </Button>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={() => resetForm()}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Driver
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle>{editingDriver ? "Edit Driver" : "Add New Driver"}</DialogTitle>
                   <DialogDescription>
@@ -172,8 +187,9 @@ export default function DriversManagement() {
                     </Button>
                   </DialogFooter>
                 </form>
-              </DialogContent>
-            </Dialog>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
