@@ -145,7 +145,7 @@ export default function AnalyticsDashboard() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹{dailyAnalytics.totalAmount?.toLocaleString() || 0}</div>
+              <div className="text-2xl font-bold">${dailyAnalytics.totalAmount?.toLocaleString() || 0}</div>
               <p className="text-xs text-muted-foreground">From {dailyAnalytics.driverBreakdown?.length || 0} drivers</p>
             </CardContent>
           </Card>
@@ -168,7 +168,7 @@ export default function AnalyticsDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ₹{dailyAnalytics.driverBreakdown?.length > 0 
+                ${dailyAnalytics.driverBreakdown?.length > 0 
                   ? Math.round(dailyAnalytics.totalAmount / dailyAnalytics.driverBreakdown.length).toLocaleString()
                   : 0}
               </div>
@@ -214,9 +214,9 @@ export default function AnalyticsDashboard() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹{analytics.summary.totalRevenue.toLocaleString()}</div>
+              <div className="text-2xl font-bold">${analytics.summary.totalRevenue.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                Avg: ₹{Math.round(analytics.summary.averageOrderValue).toLocaleString()} per order
+                Avg: ${Math.round(analytics.summary.averageOrderValue).toLocaleString()} per order
               </p>
             </CardContent>
           </Card>
@@ -228,7 +228,7 @@ export default function AnalyticsDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ₹{Math.round(analytics.summary.totalRevenue / Math.max(1, analytics.summary.totalOrders)).toLocaleString()}
+                ${Math.round(analytics.summary.totalRevenue / Math.max(1, analytics.summary.totalOrders)).toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">Per day in period</p>
             </CardContent>
@@ -269,8 +269,8 @@ export default function AnalyticsDashboard() {
                         <span className="text-red-600 ml-1">{driver.totalNonVegFood}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">₹{driver.totalRevenue.toLocaleString()}</TableCell>
-                    <TableCell>₹{Math.round(driver.totalRevenue / driver.totalOrders).toLocaleString()}</TableCell>
+                    <TableCell className="font-medium">${driver.totalRevenue.toLocaleString()}</TableCell>
+                    <TableCell>${Math.round(driver.totalRevenue / driver.totalOrders).toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -309,7 +309,7 @@ export default function AnalyticsDashboard() {
                         <span className="text-red-600 ml-1">{driver.nonVegCount}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">₹{driver.totalAmount.toLocaleString()}</TableCell>
+                    <TableCell className="font-medium">${driver.totalAmount.toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

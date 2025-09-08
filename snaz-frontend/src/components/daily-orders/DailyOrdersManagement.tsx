@@ -325,7 +325,7 @@ export default function DailyOrdersManagement() {
                     </CardDescription>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold">₹{order.totalAmount.toLocaleString()}</div>
+                    <div className="text-2xl font-bold">${order.totalAmount.toLocaleString()}</div>
                     <div className="text-sm text-gray-500">{order.totalFood} items</div>
                   </div>
                 </div>
@@ -391,7 +391,7 @@ export default function DailyOrdersManagement() {
                         <TableCell className="text-red-600">{item.nonVegCount}</TableCell>
                         <TableCell className="text-green-600">{item.vegCount}</TableCell>
                         <TableCell className="font-medium">{item.totalCount}</TableCell>
-                        <TableCell>₹{item.totalAmount}</TableCell>
+                        <TableCell>${item.totalAmount}</TableCell>
                         <TableCell>
                           <Button
                             variant="outline"

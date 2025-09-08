@@ -76,7 +76,7 @@ export default function Dashboard() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹92,847</div>
+              <div className="text-2xl font-bold">$92,847</div>
               <p className="text-xs text-muted-foreground">
                 <Badge variant="default" className="mr-1">+8.2%</Badge>
                 from last week
@@ -177,7 +177,7 @@ export default function Dashboard() {
                 <div className="text-sm text-muted-foreground">Active Routes</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-purple-600">₹15,240</div>
+                <div className="text-2xl font-bold text-purple-600">$15,240</div>
                 <div className="text-sm text-muted-foreground">Avg Order Value</div>
               </div>
             </div>

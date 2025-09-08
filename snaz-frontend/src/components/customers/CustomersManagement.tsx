@@ -25,7 +25,6 @@ export default function CustomersManagement() {
     name: "",
     address: "",
     phone: "",
-    email: "",
     driverId: "",
     packages: [{ categoryId: "", unitPrice: 0 }],
     dailyFood: {
@@ -103,7 +102,6 @@ export default function CustomersManagement() {
       name: customer.name,
       address: customer.address,
       phone: customer.phone || "",
-      email: customer.email || "",
       driverId: typeof customer.driverId === 'string' ? customer.driverId : customer.driverId._id,
       packages: customer.packages.map(pkg => ({
         categoryId: typeof pkg.categoryId === 'string' ? pkg.categoryId : pkg.categoryId._id,
@@ -153,7 +151,6 @@ export default function CustomersManagement() {
       name: "",
       address: "",
       phone: "",
-      email: "",
       driverId: "",
       packages: [{ categoryId: "", unitPrice: 0 }],
       dailyFood: { lunch: "", dinner: "" },
@@ -235,7 +232,7 @@ export default function CustomersManagement() {
                         <option value="">Select Driver</option>
                         {drivers.map(driver => (
                           <option key={driver._id} value={driver._id}>
-                            {driver.name} - {driver.route}
+                            {driver.name}
                           </option>
                         ))}
                       </select>
@@ -423,7 +420,7 @@ export default function CustomersManagement() {
                         {customer.packages.map((pkg, idx) => (
                           <Badge key={idx} variant="outline" className="text-xs">
                             <Package className="w-3 h-3 mr-1" />
-                            {getCategoryName(pkg.categoryId)}: ₹{pkg.unitPrice}
+                            {getCategoryName(pkg.categoryId)}: ${pkg.unitPrice}
                           </Badge>
                         ))}
                       </div>

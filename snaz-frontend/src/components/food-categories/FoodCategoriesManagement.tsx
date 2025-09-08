@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit, Trash2, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Download } from "lucide-react";
 import { apiClient, FoodCategory } from "@/lib/api";
+import { ExcelExporter } from "@/lib/excel-export";
 import { toast } from "sonner";
 
 export default function FoodCategoriesManagement() {
@@ -93,11 +94,25 @@ export default function FoodCategoriesManagement() {
     setIsDialogOpen(false);
   };
 
+  const handleExportCategories = () => {
+    try {
+      ExcelExporter.exportFoodCategories(filteredCategories);
+      toast.success("Food categories exported successfully");
+    } catch (error) {
+      toast.error("Failed to export categories");
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>All Food Categories</CardTitle>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportCategories}>
+              <Download className="w-4 h-4 mr-2" />
+              Export Excel
+            </Button>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={() => resetForm()}>
@@ -105,42 +120,42 @@ export default function FoodCategoriesManagement() {
                   Add Category
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
+              <DialogContent className="sm:max-w-[380px] p-4">
                 <DialogHeader>
-                  <DialogTitle>{editingCategory ? "Edit Food Category" : "Add New Food Category"}</DialogTitle>
-                  <DialogDescription>
+                  <DialogTitle className="text-lg">{editingCategory ? "Edit Food Category" : "Add New Food Category"}</DialogTitle>
+                  <DialogDescription className="text-xs">
                     {editingCategory ? "Update the food category's information." : "Enter the food category details below."}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">Name</Label>
+                  <div className="grid gap-3 py-2">
+                    <div className="grid grid-cols-4 items-center gap-3">
+                      <Label htmlFor="name" className="text-right text-sm">Name</Label>
                       <Input
                         id="name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="col-span-3"
+                        className="col-span-3 h-9"
                         required
                         placeholder="e.g., Normal, Special, Premium"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="description" className="text-right">Description</Label>
+                    <div className="grid grid-cols-4 items-center gap-3">
+                      <Label htmlFor="description" className="text-right text-sm">Description</Label>
                       <Input
                         id="description"
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="col-span-3"
+                        className="col-span-3 h-9"
                         placeholder="Brief description (optional)"
                       />
                     </div>
                   </div>
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={resetForm}>
+                  <DialogFooter className="gap-2">
+                    <Button type="button" size="sm" variant="outline" onClick={resetForm}>
                       Cancel
                     </Button>
-                    <Button type="submit">
+                    <Button type="submit" size="sm">
                       {editingCategory ? "Update" : "Create"}
                     </Button>
                   </DialogFooter>
@@ -148,44 +163,47 @@ export default function FoodCategoriesManagement() {
               </DialogContent>
             </Dialog>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-2 mb-4">
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div className="flex items-center space-x-2">
             <Search className="w-4 h-4 text-gray-500" />
             <Input
               placeholder="Search categories by name or description..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
+              className="h-8 w-[180px] sm:w-[250px]"
             />
           </div>
+        </div>
 
           {loading ? (
             <div className="text-center py-8">Loading food categories...</div>
           ) : (
-            <Table>
+            <Table className="min-w-[700px] md:min-w-0">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="px-2">Name</TableHead>
+                  <TableHead className="px-2 hidden md:table-cell">Description</TableHead>
+                  <TableHead className="px-2 hidden md:table-cell">Status</TableHead>
+                  <TableHead className="px-2 hidden lg:table-cell">Created</TableHead>
+                  <TableHead className="px-2 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredCategories.map((category) => (
                   <TableRow key={category._id}>
-                    <TableCell className="font-medium">{category.name}</TableCell>
-                    <TableCell>{category.description || "-"}</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium px-2">{category.name}</TableCell>
+                    <TableCell className="px-2 hidden md:table-cell">{category.description || "-"}</TableCell>
+                    <TableCell className="px-2 hidden md:table-cell">
                       <Badge variant={category.isActive ? "default" : "secondary"}>
                         {category.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
-                    <TableCell>{new Date(category.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
+                    <TableCell className="px-2 hidden lg:table-cell">{new Date(category.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="px-2 text-right">
+                      <div className="flex justify-end space-x-2">
                         <Button
                           variant="outline"
                           size="sm"

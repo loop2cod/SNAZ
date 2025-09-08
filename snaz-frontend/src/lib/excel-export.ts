@@ -41,7 +41,7 @@ export class ExcelExporter {
       const driverName = typeof customer.driverId === 'object' ? customer.driverId.name : 'Unknown';
       const packages = customer.packages.map(pkg => {
         const categoryName = typeof pkg.categoryId === 'object' ? pkg.categoryId.name : 'Unknown';
-        return `${categoryName}: ₹${pkg.unitPrice}`;
+        return `${categoryName}: $${pkg.unitPrice}`;
       }).join(', ');
 
       return {
@@ -66,10 +66,11 @@ export class ExcelExporter {
   /**
    * Export daily orders to Excel
    */
-  static exportDailyOrders(orders: DailyOrder[], filename?: string) {
+  static exportDailyOrders(orders: DailyOrder[], mealType?: string, filename?: string) {
     if (!filename) {
       const date = orders.length > 0 ? new Date(orders[0].date).toISOString().split('T')[0] : 'daily-orders';
-      filename = `daily-orders-${date}.xlsx`;
+      const mealPrefix = mealType ? `${mealType}-` : '';
+      filename = `${mealPrefix}orders-${date}.xlsx`;
     }
 
     // Summary sheet

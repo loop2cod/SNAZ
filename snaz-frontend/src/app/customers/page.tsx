@@ -2,31 +2,25 @@
 
 import { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit, Trash2, Search, Package, Truck, Download, Save, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { apiClient, Customer, Driver, FoodCategory } from "@/lib/api";
 import { ExcelExporter } from "@/lib/excel-export";
+import { CustomersDataTable } from "@/components/customers/CustomersDataTable";
+import QuickCustomerForm from "@/components/customers/QuickCustomerForm";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [foodCategories, setFoodCategories] = useState<FoodCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     address: "",
     phone: "",
-    email: "",
     driverId: "",
     packages: [{ categoryId: "", unitPrice: 0 }],
     dailyFood: {
@@ -41,15 +35,6 @@ export default function CustomersPage() {
     loadData();
   }, []);
 
-  useEffect(() => {
-    const filtered = customers.filter(customer =>
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (customer.phone || "").includes(searchTerm)
-    );
-    setFilteredCustomers(filtered);
-  }, [customers, searchTerm]);
-
   const loadData = async () => {
     try {
       const [customersData, driversData, categoriesData] = await Promise.all([
@@ -58,7 +43,6 @@ export default function CustomersPage() {
         apiClient.getFoodCategories()
       ]);
       setCustomers(customersData);
-      setFilteredCustomers(customersData);
       setDrivers(driversData);
       setFoodCategories(categoriesData);
     } catch (error) {
@@ -68,17 +52,16 @@ export default function CustomersPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleQuickFormSubmit = async (submittedFormData: any) => {
     try {
-      const validPackages = formData.packages.filter(pkg => pkg.categoryId && pkg.unitPrice > 0);
+      const validPackages = submittedFormData.packages.filter((pkg: any) => pkg.categoryId && pkg.unitPrice > 0);
       if (validPackages.length === 0) {
         toast.error("At least one package with valid category and price is required");
         return;
       }
 
       const customerData = {
-        ...formData,
+        ...submittedFormData,
         packages: validPackages
       };
 
@@ -91,7 +74,8 @@ export default function CustomersPage() {
         setCustomers([...customers, newCustomer]);
         toast.success("Customer created successfully");
       }
-      resetForm();
+      setShowAddForm(false);
+      setEditingCustomer(null);
     } catch (error) {
       toast.error(editingCustomer ? "Failed to update customer" : "Failed to create customer");
     }
@@ -103,7 +87,6 @@ export default function CustomersPage() {
       name: customer.name,
       address: customer.address,
       phone: customer.phone || "",
-      email: customer.email || "",
       driverId: typeof customer.driverId === 'string' ? customer.driverId : customer.driverId._id,
       packages: customer.packages.map(pkg => ({
         categoryId: typeof pkg.categoryId === 'string' ? pkg.categoryId : pkg.categoryId._id,
@@ -114,7 +97,6 @@ export default function CustomersPage() {
       endDate: customer.endDate ? customer.endDate.split('T')[0] : ""
     });
     setShowAddForm(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (customer: Customer) => {
@@ -129,61 +111,28 @@ export default function CustomersPage() {
     }
   };
 
-  const addPackage = () => {
-    setFormData({
-      ...formData,
-      packages: [...formData.packages, { categoryId: "", unitPrice: 0 }]
-    });
-  };
-
-  const removePackage = (index: number) => {
-    setFormData({
-      ...formData,
-      packages: formData.packages.filter((_, i) => i !== index)
-    });
-  };
-
-  const updatePackage = (index: number, field: string, value: string | number) => {
-    const updatedPackages = [...formData.packages];
-    updatedPackages[index] = { ...updatedPackages[index], [field]: value };
-    setFormData({ ...formData, packages: updatedPackages });
-  };
-
-  const resetForm = () => {
+  const handleAddNew = () => {
+    setEditingCustomer(null);
     setFormData({
       name: "",
       address: "",
       phone: "",
-      email: "",
       driverId: "",
       packages: [{ categoryId: "", unitPrice: 0 }],
       dailyFood: { lunch: "", dinner: "" },
       startDate: "",
       endDate: ""
     });
-    setEditingCustomer(null);
-    setShowAddForm(false);
+    setShowAddForm(true);
   };
 
   const handleExportCustomers = () => {
     try {
-      ExcelExporter.exportCustomers(filteredCustomers);
+      ExcelExporter.exportCustomers(customers);
       toast.success("Customers data exported successfully");
     } catch (error) {
       toast.error("Failed to export customers data");
     }
-  };
-
-  const getDriverName = (driverId: string | Driver) => {
-    if (typeof driverId === 'object') return driverId.name;
-    const driver = drivers.find(d => d._id === driverId);
-    return driver?.name || "Unknown Driver";
-  };
-
-  const getCategoryName = (categoryId: string | FoodCategory) => {
-    if (typeof categoryId === 'object') return categoryId.name;
-    const category = foodCategories.find(c => c._id === categoryId);
-    return category?.name || "Unknown Category";
   };
 
   return (
@@ -194,332 +143,39 @@ export default function CustomersPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
             <p className="text-muted-foreground">
-              Manage customers, their packages, and daily food requirements
+              Manage customers with tally accounting-style interface
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleExportCustomers}>
-              <Download className="w-4 h-4 mr-2" />
-              Export Excel
-            </Button>
-            <Button onClick={() => setShowAddForm(!showAddForm)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Customer
+          <div>
+            <Button onClick={handleAddNew}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Customer
             </Button>
           </div>
         </div>
 
-        {/* Add/Edit Form */}
         {showAddForm && (
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>{editingCustomer ? "Edit Customer" : "Add New Customer"}</CardTitle>
-                  <CardDescription>
-                    {editingCustomer ? "Update the customer's information" : "Enter the customer's details below"}
-                  </CardDescription>
-                </div>
-                <Button variant="ghost" size="sm" onClick={resetForm}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Basic Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Customer Name *</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                      placeholder="Enter customer name"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="driverId">Assigned Driver *</Label>
-                    <select
-                      id="driverId"
-                      value={formData.driverId}
-                      onChange={(e) => setFormData({ ...formData, driverId: e.target.value })}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      required
-                    >
-                      <option value="">Select Driver</option>
-                      {drivers.map(driver => (
-                        <option key={driver._id} value={driver._id}>
-                          {driver.name} - {driver.route}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="address">Address *</Label>
-                    <Input
-                      id="address"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      required
-                      placeholder="Enter full address"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="Phone number"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="Email address"
-                    />
-                  </div>
-                </div>
-
-                {/* Package Pricing */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">Package Pricing *</Label>
-                    <Button type="button" variant="outline" size="sm" onClick={addPackage}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Package
-                    </Button>
-                  </div>
-                  <div className="space-y-3">
-                    {formData.packages.map((pkg, index) => (
-                      <div key={index} className="flex items-center gap-4 p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <Label className="text-sm">Food Category</Label>
-                          <select
-                            value={pkg.categoryId}
-                            onChange={(e) => updatePackage(index, 'categoryId', e.target.value)}
-                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm mt-1"
-                          >
-                            <option value="">Select Category</option>
-                            {foodCategories.map(category => (
-                              <option key={category._id} value={category._id}>
-                                {category.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="w-32">
-                          <Label className="text-sm">Unit Price (₹)</Label>
-                          <Input
-                            type="number"
-                            placeholder="0"
-                            value={pkg.unitPrice || ""}
-                            onChange={(e) => updatePackage(index, 'unitPrice', Number(e.target.value))}
-                            className="mt-1"
-                          />
-                        </div>
-                        {formData.packages.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removePackage(index)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Daily Food Requirements */}
-                <div className="space-y-4">
-                  <Label className="text-base font-medium">Daily Food Requirements *</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="lunch">Lunch (Bag Format)</Label>
-                      <Input
-                        id="lunch"
-                        placeholder="e.g., 5,5+7"
-                        value={formData.dailyFood.lunch}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          dailyFood: { ...formData.dailyFood, lunch: e.target.value }
-                        })}
-                        required
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Format: Non-veg counts + veg count (e.g., &quot;5,5+7&quot; = 10 non-veg + 7 veg)
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dinner">Dinner (Bag Format)</Label>
-                      <Input
-                        id="dinner"
-                        placeholder="e.g., 3+5"
-                        value={formData.dailyFood.dinner}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          dailyFood: { ...formData.dailyFood, dinner: e.target.value }
-                        })}
-                        required
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Format: Non-veg counts + veg count
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Date Range */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="startDate">Start Date *</Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="endDate">End Date (Optional)</Label>
-                    <Input
-                      id="endDate"
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                {/* Form Actions */}
-                <div className="flex justify-end gap-2 pt-4 border-t">
-                  <Button type="button" variant="outline" onClick={resetForm}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">
-                    <Save className="w-4 h-4 mr-2" />
-                    {editingCustomer ? "Update Customer" : "Create Customer"}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+          <QuickCustomerForm
+            embedded
+            drivers={drivers}
+            foodCategories={foodCategories}
+            onSubmit={handleQuickFormSubmit}
+            onCancel={() => setShowAddForm(false)}
+            initialData={editingCustomer ? formData : undefined}
+            isEditing={!!editingCustomer}
+          />
         )}
 
-        {/* Search and Customers List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Customer List</CardTitle>
-            <div className="flex items-center space-x-2">
-              <Search className="w-4 h-4 text-gray-500" />
-              <Input
-                placeholder="Search customers by name, address, or phone..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="text-center py-8">Loading customers...</div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Address</TableHead>
-                    <TableHead>Driver</TableHead>
-                    <TableHead>Packages</TableHead>
-                    <TableHead>Daily Food</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCustomers.map((customer) => (
-                    <TableRow key={customer._id}>
-                      <TableCell className="font-medium">
-                        <div>
-                          <div className="font-medium">{customer.name}</div>
-                          {customer.phone && (
-                            <div className="text-sm text-gray-500">{customer.phone}</div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">{customer.address}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Truck className="w-4 h-4 text-gray-400" />
-                          {getDriverName(customer.driverId)}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {customer.packages.map((pkg, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs">
-                              <Package className="w-3 h-3 mr-1" />
-                              {getCategoryName(pkg.categoryId)}: ₹{pkg.unitPrice}
-                            </Badge>
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <div>L: {customer.dailyFood.lunch}</div>
-                          <div>D: {customer.dailyFood.dinner}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={customer.isActive ? "default" : "secondary"}>
-                          {customer.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEdit(customer)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDelete(customer)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-
-            {!loading && filteredCustomers.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                {searchTerm ? "No customers found matching your search." : "No customers added yet."}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Data Table */}
+        <CustomersDataTable
+          customers={customers}
+          drivers={drivers}
+          foodCategories={foodCategories}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onExport={handleExportCustomers}
+        />
       </div>
     </MainLayout>
   );

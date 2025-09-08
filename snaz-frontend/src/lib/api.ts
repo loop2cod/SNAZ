@@ -185,6 +185,22 @@ class ApiClient {
     });
   }
 
+  async updateCustomerDailyFood(id: string, dailyFood: { lunch?: string; dinner?: string }): Promise<Customer> {
+    const response = await this.request<Customer>(`/customers/${id}/daily-food`, {
+      method: 'PATCH',
+      body: JSON.stringify(dailyFood),
+    });
+    return response.data;
+  }
+
+  async bulkUpdateCustomerDailyFood(updates: { customerId: string; mealType: 'lunch' | 'dinner'; bagFormat: string }[]): Promise<Customer[]> {
+    const response = await this.request<Customer[]>('/customers/bulk-update-daily-food', {
+      method: 'PATCH',
+      body: JSON.stringify({ updates }),
+    });
+    return response.data;
+  }
+
   // Daily Orders
   async getDailyOrders(params?: { date?: string; driverId?: string }): Promise<DailyOrder[]> {
     const queryString = params ? '?' + new URLSearchParams(params as Record<string, string>).toString() : '';

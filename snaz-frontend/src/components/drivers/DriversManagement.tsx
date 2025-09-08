@@ -23,7 +23,6 @@ export default function DriversManagement() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    email: "",
     route: ""
   });
 
@@ -75,7 +74,6 @@ export default function DriversManagement() {
     setFormData({
       name: driver.name,
       phone: driver.phone || "",
-      email: driver.email || "",
       route: driver.route
     });
     setIsDialogOpen(true);
@@ -94,7 +92,7 @@ export default function DriversManagement() {
   };
 
   const resetForm = () => {
-    setFormData({ name: "", phone: "", email: "", route: "" });
+    setFormData({ name: "", phone: "", route: "" });
     setEditingDriver(null);
     setIsDialogOpen(false);
   };
@@ -125,60 +123,50 @@ export default function DriversManagement() {
                     Add Driver
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[380px] p-4">
                 <DialogHeader>
-                  <DialogTitle>{editingDriver ? "Edit Driver" : "Add New Driver"}</DialogTitle>
-                  <DialogDescription>
+                  <DialogTitle className="text-lg">{editingDriver ? "Edit Driver" : "Add New Driver"}</DialogTitle>
+                  <DialogDescription className="text-xs">
                     {editingDriver ? "Update the driver's information." : "Enter the driver's details below."}
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">Name</Label>
+                  <div className="grid gap-3 py-2">
+                    <div className="grid grid-cols-4 items-center gap-3">
+                      <Label htmlFor="name" className="text-right text-sm">Name</Label>
                       <Input
                         id="name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="col-span-3"
+                        className="col-span-3 h-9"
                         required
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="route" className="text-right">Route</Label>
+                    <div className="grid grid-cols-4 items-center gap-3">
+                      <Label htmlFor="route" className="text-right text-sm">Route</Label>
                       <Input
                         id="route"
                         value={formData.route}
                         onChange={(e) => setFormData({ ...formData, route: e.target.value })}
-                        className="col-span-3"
+                        className="col-span-3 h-9"
                         required
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="phone" className="text-right">Phone</Label>
+                    <div className="grid grid-cols-4 items-center gap-3">
+                      <Label htmlFor="phone" className="text-right text-sm">Phone</Label>
                       <Input
                         id="phone"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="col-span-3"
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="email" className="text-right">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="col-span-3"
+                        className="col-span-3 h-9"
                       />
                     </div>
                   </div>
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={resetForm}>
+                  <DialogFooter className="gap-2">
+                    <Button type="button" size="sm" variant="outline" onClick={resetForm}>
                       Cancel
                     </Button>
-                    <Button type="submit">
+                    <Button type="submit" size="sm">
                       {editingDriver ? "Update" : "Create"}
                     </Button>
                   </DialogFooter>
@@ -189,44 +177,44 @@ export default function DriversManagement() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center space-x-2 mb-4">
-            <Search className="w-4 h-4 text-gray-500" />
-            <Input
-              placeholder="Search drivers by name, route, or phone..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
-            />
+          <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+            <div className="flex items-center space-x-2">
+              <Search className="w-4 h-4 text-gray-500" />
+              <Input
+                placeholder="Search drivers by name, route, or phone..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-8 w-[180px] sm:w-[250px]"
+              />
+            </div>
           </div>
 
           {loading ? (
             <div className="text-center py-8">Loading drivers...</div>
           ) : (
-            <Table>
+            <Table className="min-w-[700px] md:min-w-0">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Route</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="px-2">Name</TableHead>
+                  <TableHead className="px-2 hidden sm:table-cell">Route</TableHead>
+                  <TableHead className="px-2 hidden md:table-cell">Phone</TableHead>
+                  <TableHead className="px-2 hidden md:table-cell">Status</TableHead>
+                  <TableHead className="px-2 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredDrivers.map((driver) => (
                   <TableRow key={driver._id}>
-                    <TableCell className="font-medium">{driver.name}</TableCell>
-                    <TableCell>{driver.route}</TableCell>
-                    <TableCell>{driver.phone || "-"}</TableCell>
-                    <TableCell>{driver.email || "-"}</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium px-2">{driver.name}</TableCell>
+                    <TableCell className="px-2 hidden sm:table-cell">{driver.route}</TableCell>
+                    <TableCell className="px-2 hidden md:table-cell">{driver.phone || "-"}</TableCell>
+                    <TableCell className="px-2 hidden md:table-cell">
                       <Badge variant={driver.isActive ? "default" : "secondary"}>
                         {driver.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
+                    <TableCell className="px-2 text-right">
+                      <div className="flex justify-end space-x-2">
                         <Button
                           variant="outline"
                           size="sm"

@@ -102,7 +102,7 @@ export default function InvoicesManagement() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ₹{invoices.reduce((sum, inv) => sum + inv.totalAmount, 0).toLocaleString()}
+                  ${invoices.reduce((sum, inv) => sum + inv.totalAmount, 0).toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground">Outstanding revenue</p>
               </CardContent>
@@ -115,7 +115,7 @@ export default function InvoicesManagement() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ₹{invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + inv.totalAmount, 0).toLocaleString()}
+                  ${invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + inv.totalAmount, 0).toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {invoices.filter(inv => inv.status === 'paid').length} invoices
@@ -130,7 +130,7 @@ export default function InvoicesManagement() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ₹{invoices.filter(inv => inv.status !== 'paid').reduce((sum, inv) => sum + inv.totalAmount, 0).toLocaleString()}
+                  ${invoices.filter(inv => inv.status !== 'paid').reduce((sum, inv) => sum + inv.totalAmount, 0).toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {invoices.filter(inv => inv.status !== 'paid').length} invoices
@@ -162,7 +162,7 @@ export default function InvoicesManagement() {
                     </div>
                     
                     <div className="text-right space-y-3">
-                      <div className="text-2xl font-bold">₹{invoice.totalAmount.toLocaleString()}</div>
+                      <div className="text-2xl font-bold">${invoice.totalAmount.toLocaleString()}</div>
                       
                       <div className="flex items-center gap-2">
                         <Button
