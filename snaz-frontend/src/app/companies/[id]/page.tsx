@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import MainLayout from "@/components/layout/MainLayout";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -146,25 +147,30 @@ export default function CompanyDetailPage() {
 
   if (loading) {
     return (
+    <ProtectedRoute>
       <MainLayout>
         <div className="flex items-center justify-center min-h-[400px]">
           Loading company details...
         </div>
       </MainLayout>
-    );
+    </ProtectedRoute>
+  );
   }
 
   if (!company) {
     return (
+    <ProtectedRoute>
       <MainLayout>
         <div className="flex items-center justify-center min-h-[400px]">
           Company not found
         </div>
       </MainLayout>
-    );
+    </ProtectedRoute>
+  );
   }
 
   return (
+    <ProtectedRoute>
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
         {/* Header */}
@@ -261,5 +267,6 @@ export default function CompanyDetailPage() {
         </div>
       </div>
     </MainLayout>
+    </ProtectedRoute>
   );
 }

@@ -1,13 +1,15 @@
 "use client";
 
 import MainLayout from "@/components/layout/MainLayout";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Users, Truck, Package, DollarSign, FileText, TrendingUp } from "lucide-react";
 
 export default function Dashboard() {
   return (
-    <MainLayout>
+    <ProtectedRoute>
+      <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -184,6 +186,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-    </MainLayout>
+      </MainLayout>
+    </ProtectedRoute>
   );
 }

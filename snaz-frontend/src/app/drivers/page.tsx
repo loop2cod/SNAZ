@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Plus } from "lucide-react";
 import { apiClient, Driver } from "@/lib/api";
 import { ExcelExporter } from "@/lib/excel-export";
@@ -96,7 +97,8 @@ export default function DriversPage() {
   };
 
   return (
-    <MainLayout>
+    <ProtectedRoute>
+      <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -135,5 +137,6 @@ export default function DriversPage() {
         />
       </div>
     </MainLayout>
+    </ProtectedRoute>
   );
 }

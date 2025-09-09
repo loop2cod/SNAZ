@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { DinnerOrdersTable } from "@/components/orders/DinnerOrdersTable";
 import { apiClient, DailyOrder } from "@/lib/api";
 import { ExcelExporter } from "@/lib/excel-export";
@@ -115,7 +116,7 @@ export default function DinnerOrdersPage() {
         const parsed = parseBagFormat(value);
         return { ...row, bagFormat: value, nonVegCount: parsed.nonVegCount, vegCount: parsed.vegCount, totalCount: parsed.totalCount };
       })
-    );
+  );
     setHasChanges(true);
   };
 
@@ -146,7 +147,7 @@ export default function DinnerOrdersPage() {
         data.map((row) =>
           apiClient.updateOrderItem(row.orderId, row.orderItemId, { bagFormat: row.bagFormat })
         )
-      );
+  );
       toast.success(`Dinner orders saved for ${new Date(currentDate).toLocaleDateString()}`);
       setHasChanges(false);
       await loadOrders();
@@ -184,6 +185,7 @@ export default function DinnerOrdersPage() {
   );
 
   return (
+    <ProtectedRoute>
     <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -254,5 +256,6 @@ export default function DinnerOrdersPage() {
         )}
       </div>
     </MainLayout>
+    </ProtectedRoute>
   );
 }

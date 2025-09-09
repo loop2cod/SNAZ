@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Plus } from "lucide-react";
 import { apiClient, Customer, Driver, FoodCategory } from "@/lib/api";
 import { ExcelExporter } from "@/lib/excel-export";
@@ -136,6 +137,7 @@ export default function CustomersPage() {
   };
 
   return (
+    <ProtectedRoute>
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
@@ -178,5 +180,6 @@ export default function CustomersPage() {
         />
       </div>
     </MainLayout>
+    </ProtectedRoute>
   );
 }

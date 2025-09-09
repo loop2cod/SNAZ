@@ -18,8 +18,10 @@ import {
   Home,
   Sun,
   Moon,
-  Building2
+  Building2,
+  LogOut
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navigationItems = [
   {
@@ -67,6 +69,7 @@ const navigationItems = [
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { logout, user } = useAuth();
 
   return (
     <>
@@ -147,8 +150,28 @@ export default function Sidebar() {
             </ul>
           </nav>
 
+          {/* User Info & Logout */}
+          <div className="p-3 border-t border-gray-200 space-y-3">
+            {/* User Info */}
+            <div className="px-3 py-2 bg-gray-50 rounded-md">
+              <div className="text-xs font-medium text-gray-700">{user?.username}</div>
+              <div className="text-[10px] text-gray-500 capitalize">{user?.role}</div>
+            </div>
+            
+            {/* Logout Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={logout}
+              className="w-full justify-start text-gray-700 hover:bg-red-50 hover:text-red-700"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
+
           {/* Footer */}
-          <div className="p-3 border-t border-gray-200">
+          <div className="p-3 border-t border-gray-100">
             <div className="text-[11px] text-gray-500 text-center leading-tight">
               <p>SNAZ Catering v1.0</p>
               <p className="mt-1">© 2024 All rights reserved</p>

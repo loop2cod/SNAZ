@@ -41,6 +41,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
+import authRoutes from './routes/authRoutes';
 import driverRoutes from './routes/driverRoutes';
 import foodCategoryRoutes from './routes/foodCategoryRoutes';
 import companyRoutes from './routes/companyRoutes';
@@ -48,6 +49,7 @@ import customerRoutes from './routes/customerRoutes';
 import dailyOrderRoutes from './routes/dailyOrderRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
 
+app.use('/api/auth', authRoutes);
 app.use('/api/drivers', driverRoutes);
 app.use('/api/food-categories', foodCategoryRoutes);
 app.use('/api/companies', companyRoutes);

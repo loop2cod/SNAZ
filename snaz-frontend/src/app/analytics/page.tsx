@@ -1,10 +1,12 @@
 "use client";
 
 import MainLayout from "@/components/layout/MainLayout";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import AnalyticsDashboard from "@/components/analytics/AnalyticsDashboard";
 
 export default function AnalyticsPage() {
   return (
+    <ProtectedRoute>
     <MainLayout>
       <div className="space-y-6">
         <div>
@@ -17,5 +19,6 @@ export default function AnalyticsPage() {
         <AnalyticsDashboard />
       </div>
     </MainLayout>
+    </ProtectedRoute>
   );
 }

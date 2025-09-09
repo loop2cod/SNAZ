@@ -94,6 +94,11 @@ export interface ApiResponse<T> {
 }
 
 class ApiClient {
+  private getAuthHeaders(): Record<string, string> {
+    const token = localStorage.getItem('token');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -102,6 +107,7 @@ class ApiClient {
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
+        ...this.getAuthHeaders(),
         ...options.headers,
       },
       ...options,
@@ -307,6 +313,53 @@ class ApiClient {
     const response = await this.request('/analytics/validate-bag-format', {
       method: 'POST',
       body: JSON.stringify({ bagFormat }),
+    });
+    return response.data;
+  }
+
+  // Authentication
+  async login(username: string, password: string) {
+    const response = await this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+      headers: {
+        'Content-Type': 'application/json',
+        // Don't include auth headers for login
+      }
+    });
+    return response.data;
+  }
+
+  async register(userData: { 
+    username: string; 
+    email: string; 
+    password: string; 
+    role?: string; 
+  }) {
+    const response = await this.request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+    return response.data;
+  }
+
+  async getProfile() {
+    const response = await this.request('/auth/profile');
+    return response.data;
+  }
+
+  async updateProfile(userData: { username?: string; email?: string }) {
+    const response = await this.request('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+    return response.data;
+  }
+
+  async changePassword(currentPassword: string, newPassword: string) {
+    const response = await this.request('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
     });
     return response.data;
   }

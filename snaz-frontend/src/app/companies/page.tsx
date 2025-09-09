@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Plus } from "lucide-react";
 import { apiClient, Company } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -92,7 +93,8 @@ export default function CompaniesPage() {
   };
 
   return (
-    <MainLayout>
+    <ProtectedRoute>
+      <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -129,5 +131,6 @@ export default function CompaniesPage() {
         />
       </div>
     </MainLayout>
+    </ProtectedRoute>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import MainLayout from "@/components/layout/MainLayout";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -380,27 +381,32 @@ export default function CustomerDetailPage() {
 
   if (loading) {
     return (
+    <ProtectedRoute>
       <MainLayout>
         <div className="flex items-center justify-center min-h-[400px]">
           Loading customer details...
         </div>
       </MainLayout>
-    );
+    </ProtectedRoute>
+  );
   }
 
   if (!customer) {
     return (
+    <ProtectedRoute>
       <MainLayout>
         <div className="flex items-center justify-center min-h-[400px]">
           Customer not found
         </div>
       </MainLayout>
-    );
+    </ProtectedRoute>
+  );
   }
 
   const days = getOrderedDays();
 
   return (
+    <ProtectedRoute>
     <MainLayout>
       <div className="space-y-4 sm:space-y-6">
         {/* Header */}
@@ -587,6 +593,7 @@ export default function CustomerDetailPage() {
                       const dayTotal = (lunch?.totalCount || 0) + (dinner?.totalCount || 0);
                       
                       return (
+    <ProtectedRoute>
                         <TableRow key={day} className="hover:bg-muted/50">
                           <TableCell className="font-medium text-xs px-2 py-3">
                             {formatDayLabel(day)}
@@ -643,7 +650,7 @@ export default function CustomerDetailPage() {
                             {dayTotal || 0}
                           </TableCell>
                         </TableRow>
-                      );
+  );
                     })}
                   </TableBody>
                   </Table>
@@ -655,6 +662,7 @@ export default function CustomerDetailPage() {
             {days.length > 0 && (() => {
               const totals = calculateMonthTotals();
               return (
+    <ProtectedRoute>
                 <div className="mt-6 pt-4 border-t">
                   <div className="overflow-x-auto">
                     <Table>
@@ -695,11 +703,12 @@ export default function CustomerDetailPage() {
                     </Table>
                   </div>
                 </div>
-              );
+  );
             })()}
           </CardContent>
         </Card>
       </div>
     </MainLayout>
+    </ProtectedRoute>
   );
 }
