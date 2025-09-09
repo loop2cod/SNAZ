@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Edit, Trash2, Package, Truck, Search, Download } from "lucide-react"
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Edit, Trash2, Package, Truck, Search, Download, Eye } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -40,6 +40,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Customer, Driver, FoodCategory } from "@/lib/api"
 import { parseBagFormat } from "@/lib/bagFormatParser"
+import { useRouter } from "next/navigation"
 
 interface CustomersDataTableProps {
   customers: Customer[]
@@ -60,6 +61,7 @@ export function CustomersDataTable({
   onDelete,
   onExport
 }: CustomersDataTableProps) {
+  const router = useRouter()
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -250,6 +252,10 @@ export function CustomersDataTable({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => router.push(`/customers/${customer._id}`)}>
+                <Eye className="mr-2 h-3 w-3" />
+                View Details
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEdit(customer)}>
                 <Edit className="mr-2 h-3 w-3" />
                 Edit Customer

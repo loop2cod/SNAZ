@@ -163,6 +163,11 @@ class ApiClient {
     return response.data;
   }
 
+  async getCustomer(id: string): Promise<Customer> {
+    const response = await this.request<Customer>(`/customers/${id}`);
+    return response.data;
+  }
+
   async createCustomer(customer: Partial<Customer>): Promise<Customer> {
     const response = await this.request<Customer>('/customers', {
       method: 'POST',
@@ -202,7 +207,7 @@ class ApiClient {
   }
 
   // Daily Orders
-  async getDailyOrders(params?: { date?: string; driverId?: string }): Promise<DailyOrder[]> {
+  async getDailyOrders(params?: { date?: string; driverId?: string; startDate?: string; endDate?: string }): Promise<DailyOrder[]> {
     const queryString = params ? '?' + new URLSearchParams(params as Record<string, string>).toString() : '';
     const response = await this.request<DailyOrder[]>(`/daily-orders${queryString}`);
     return response.data;
