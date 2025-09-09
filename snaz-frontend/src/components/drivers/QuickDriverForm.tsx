@@ -64,9 +64,9 @@ export default function QuickDriverForm({
   return (
     <div className={embedded ? "" : "min-h-screen bg-gradient-to-br from-slate-50 to-slate-100"} onKeyDown={handleKeyDown}>
       <div className={embedded ? "py-3" : "container mx-auto py-6 px-4"}>
-        <Card className={embedded ? "shadow-md border-slate-200 bg-white" : "max-w-4xl mx-auto shadow-lg border-0 bg-white"}>
-          <CardHeader className={embedded ? "pb-4 border-b bg-gradient-to-r from-green-50 to-emerald-50" : "pb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-slate-200"}>
-            <div className="flex items-center justify-between">
+        <Card className={embedded ? "shadow-md border-slate-200 bg-white py-0" : "max-w-4xl mx-auto shadow-lg border-0 bg-white py-0"}>
+          <CardHeader className={embedded ? "border-b bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl rounded-b-none" : "pb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-slate-200 rounded-xl rounded-b-none"}>
+            <div className="flex items-center justify-between pt-2">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-100 rounded-lg">
                   <Truck className="h-5 w-5 text-green-600" />
@@ -93,9 +93,9 @@ export default function QuickDriverForm({
           </CardHeader>
 
           <CardContent className={embedded ? "p-4" : "p-6"}>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="">
               {/* Driver Information Section */}
-              <div className="bg-slate-50 rounded-lg p-4">
+              <div className="">
                 <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
                   <Truck className="h-4 w-4" />
                   Driver Information
@@ -111,7 +111,7 @@ export default function QuickDriverForm({
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
-                      className="h-10 border-slate-300 focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                      className=" border-slate-300 focus:border-green-500 focus:ring-2 focus:ring-green-100"
                       placeholder="Enter driver name"
                     />
                   </div>
@@ -125,7 +125,7 @@ export default function QuickDriverForm({
                       value={formData.route}
                       onChange={(e) => setFormData({ ...formData, route: e.target.value })}
                       required
-                      className="h-10 border-slate-300 focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                      className=" border-slate-300 focus:border-green-500 focus:ring-2 focus:ring-green-100"
                       placeholder="Route name/area"
                     />
                   </div>
@@ -138,7 +138,7 @@ export default function QuickDriverForm({
                     <Input
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="h-10 border-slate-300 focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                      className=" border-slate-300 focus:border-green-500 focus:ring-2 focus:ring-green-100"
                       placeholder="Enter phone number"
                     />
                   </div>
@@ -146,12 +146,12 @@ export default function QuickDriverForm({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row justify-center gap-3 pt-6 border-t border-slate-200">
+              <div className="flex flex-col sm:flex-row justify-center gap-3 pt-6 ">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onCancel}
-                  className="h-11 px-8 text-sm border-slate-300 hover:bg-slate-100 order-2 sm:order-1"
+                  className="text-sm border-slate-300 hover:bg-slate-100 order-2 sm:order-1"
                   disabled={loading}
                 >
                   <X className="h-4 w-4 mr-2" />
@@ -160,7 +160,7 @@ export default function QuickDriverForm({
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="h-11 px-8 text-sm bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg order-1 sm:order-2"
+                  className="text-sm bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg order-1 sm:order-2"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {loading ? "Saving..." : isEditing ? "Update Driver (Alt+S)" : "Save Driver (Alt+S)"}

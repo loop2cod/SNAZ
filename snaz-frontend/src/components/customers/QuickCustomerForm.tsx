@@ -96,10 +96,10 @@ export default function QuickCustomerForm({
 
   return (
     <div className={embedded ? "" : "min-h-screen bg-gradient-to-br from-slate-50 to-slate-100"} onKeyDown={handleKeyDown}>
-      <div className={embedded ? "py-3" : "container mx-auto py-6 px-4"}>
-        <Card className={embedded ? "shadow-md border-slate-200 bg-white" : "max-w-5xl mx-auto shadow-lg border-0 bg-white"}>
-          <CardHeader className={embedded ? "pb-3 border-b bg-gradient-to-r from-blue-50 to-indigo-50" : "pb-5 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-slate-200"}>
-            <div className="flex items-center justify-between">
+      <div className={embedded ? "" : "container mx-auto"}>
+        <Card className={embedded ? "shadow-md border-slate-200 bg-white py-0" : "max-w-5xl mx-auto shadow-lg border-0 bg-white py-0"}>
+          <CardHeader className={embedded ? "border-b bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl rounded-b-none" : "bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-slate-200 rounded-xl rounded-b-none"}>
+            <div className="flex items-center justify-between pt-2">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <User className="h-5 w-5 text-blue-600" />
@@ -126,9 +126,9 @@ export default function QuickCustomerForm({
           </CardHeader>
 
           <CardContent className={embedded ? "p-4" : "p-6"}>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="">
               {/* Basic Info Section */}
-              <div className="bg-slate-50 rounded-lg p-3">
+              <div className="">
                 <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
                   <User className="h-4 w-4" />
                   Customer Information
@@ -158,7 +158,7 @@ export default function QuickCustomerForm({
                       value={formData.driverId}
                       onValueChange={(value) => setFormData({ ...formData, driverId: value })}
                     >
-                      <SelectTrigger className="h-8 border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-100">
+                      <SelectTrigger className="h-8 border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 w-full">
                         <SelectValue placeholder="Select driver" />
                       </SelectTrigger>
                       <SelectContent>
@@ -201,11 +201,7 @@ export default function QuickCustomerForm({
               </div>
 
               {/* Address Section */}
-              <div className="bg-slate-50 rounded-lg p-3">
-                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  Address & Duration
-                </h3>
+              <div className="">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                   <div className="lg:col-span-2">
                     <Label className="text-xs font-medium text-slate-700 mb-1 block">
@@ -234,13 +230,9 @@ export default function QuickCustomerForm({
               </div>
 
               {/* Package Pricing Section (single selection) */}
-              <div className="bg-slate-50 rounded-lg p-3">
-                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                  <Package className="h-4 w-4" />
-                  Package Pricing
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-3 rounded-lg border border-slate-200">
-                  <div className="md:col-span-2">
+              <div className="">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white p-3 rounded-lg">
+                  <div className="">
                     <Label className="text-xs font-medium text-slate-700 mb-1 block">Food Category *</Label>
                     <Select
                       value={formData.packages[0]?.categoryId || ""}
@@ -271,17 +263,12 @@ export default function QuickCustomerForm({
                     />
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-2">Only one category can be selected for this customer.</p>
               </div>
 
               {/* Daily Food Requirements Section */}
-              <div className="bg-slate-50 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
-                  <Utensils className="h-4 w-4" />
-                  Daily Food Requirements
-                </h3>
+              <div className="">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="bg-white rounded-lg p-4 border border-slate-200">
+                  <div className="bg-white rounded-lg p-4">
                     <Label className="text-xs font-medium text-slate-700 mb-1.5 block">
                       Lunch (Bag Format) *
                     </Label>
@@ -299,7 +286,7 @@ export default function QuickCustomerForm({
                       <strong>Format:</strong> Non-veg counts + veg count (e.g., 5,5+7 = 10 non-veg + 7 veg)
                     </p>
                   </div>
-                  <div className="bg-white rounded-lg p-4 border border-slate-200">
+                  <div className="bg-white rounded-lg p-4">
                     <Label className="text-xs font-medium text-slate-700 mb-1.5 block">
                       Dinner (Bag Format) *
                     </Label>
@@ -321,7 +308,7 @@ export default function QuickCustomerForm({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row justify-center gap-2 pt-4 border-t border-slate-200">
+              <div className="flex flex-col sm:flex-row justify-center gap-2 pt-4">
                 <Button
                   type="button"
                   variant="outline"
