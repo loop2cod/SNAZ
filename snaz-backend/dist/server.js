@@ -24,12 +24,16 @@ app.use((0, cors_1.default)({
 app.use((0, morgan_1.default)('combined'));
 app.use(express_1.default.json({ limit: '10mb' }));
 app.use(express_1.default.urlencoded({ extended: true }));
-// Rate limiting
-const limiter = (0, express_rate_limit_1.default)({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
-});
-app.use('/api/', limiter);
+// Rate limiting (enabled in production unless explicitly disabled)
+if (process.env.NODE_ENV === 'production' || process.env.ENABLE_RATE_LIMIT === 'true') {
+    const limiter = (0, express_rate_limit_1.default)({
+        windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000), // default 15 minutes
+        max: Number(process.env.RATE_LIMIT_MAX || 100), // default 100 requests per window
+        standardHeaders: true,
+        legacyHeaders: false,
+    });
+    app.use('/api/', limiter);
+}
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -37,11 +41,13 @@ app.get('/api/health', (req, res) => {
 // Routes
 const driverRoutes_1 = __importDefault(require("./routes/driverRoutes"));
 const foodCategoryRoutes_1 = __importDefault(require("./routes/foodCategoryRoutes"));
+const companyRoutes_1 = __importDefault(require("./routes/companyRoutes"));
 const customerRoutes_1 = __importDefault(require("./routes/customerRoutes"));
 const dailyOrderRoutes_1 = __importDefault(require("./routes/dailyOrderRoutes"));
 const analyticsRoutes_1 = __importDefault(require("./routes/analyticsRoutes"));
 app.use('/api/drivers', driverRoutes_1.default);
 app.use('/api/food-categories', foodCategoryRoutes_1.default);
+app.use('/api/companies', companyRoutes_1.default);
 app.use('/api/customers', customerRoutes_1.default);
 app.use('/api/daily-orders', dailyOrderRoutes_1.default);
 app.use('/api/analytics', analyticsRoutes_1.default);

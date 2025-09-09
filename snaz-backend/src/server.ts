@@ -43,12 +43,14 @@ app.get('/api/health', (req, res) => {
 // Routes
 import driverRoutes from './routes/driverRoutes';
 import foodCategoryRoutes from './routes/foodCategoryRoutes';
+import companyRoutes from './routes/companyRoutes';
 import customerRoutes from './routes/customerRoutes';
 import dailyOrderRoutes from './routes/dailyOrderRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
 
 app.use('/api/drivers', driverRoutes);
 app.use('/api/food-categories', foodCategoryRoutes);
+app.use('/api/companies', companyRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/daily-orders', dailyOrderRoutes);
 app.use('/api/analytics', analyticsRoutes);

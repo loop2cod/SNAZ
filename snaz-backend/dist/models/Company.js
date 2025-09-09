@@ -34,35 +34,12 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const CustomerPackageSchema = new mongoose_1.Schema({
-    categoryId: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'FoodCategory',
-        required: true
-    },
-    unitPrice: {
-        type: Number,
-        required: true,
-        min: 0
-    }
-});
-const DailyFoodSchema = new mongoose_1.Schema({
-    lunch: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    dinner: {
-        type: String,
-        required: true,
-        trim: true
-    }
-});
-const CustomerSchema = new mongoose_1.Schema({
+const CompanySchema = new mongoose_1.Schema({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
     address: {
         type: String,
@@ -75,28 +52,12 @@ const CustomerSchema = new mongoose_1.Schema({
     },
     email: {
         type: String,
+        trim: true,
+        lowercase: true
+    },
+    contactPerson: {
+        type: String,
         trim: true
-    },
-    companyId: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Company'
-    },
-    driverId: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Driver',
-        required: true
-    },
-    packages: [CustomerPackageSchema],
-    dailyFood: {
-        type: DailyFoodSchema,
-        required: true
-    },
-    startDate: {
-        type: Date,
-        required: true
-    },
-    endDate: {
-        type: Date
     },
     isActive: {
         type: Boolean,
@@ -105,5 +66,8 @@ const CustomerSchema = new mongoose_1.Schema({
 }, {
     timestamps: true
 });
-exports.default = mongoose_1.default.model('Customer', CustomerSchema);
-//# sourceMappingURL=Customer.js.map
+// Index for efficient queries
+CompanySchema.index({ name: 1 });
+CompanySchema.index({ isActive: 1 });
+exports.default = mongoose_1.default.model('Company', CompanySchema);
+//# sourceMappingURL=Company.js.map

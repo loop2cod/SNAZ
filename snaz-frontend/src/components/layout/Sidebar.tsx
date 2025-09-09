@@ -17,7 +17,8 @@ import {
   X,
   Home,
   Sun,
-  Moon
+  Moon,
+  Building2
 } from "lucide-react";
 
 const navigationItems = [
@@ -35,6 +36,11 @@ const navigationItems = [
     title: "Drivers",
     href: "/drivers",
     icon: Truck
+  },
+  {
+    title: "Companies",
+    href: "/companies",
+    icon: Building2
   },
   {
     title: "Customers",

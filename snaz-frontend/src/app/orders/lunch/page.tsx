@@ -8,7 +8,7 @@ import { ExcelExporter } from "@/lib/excel-export";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, Save } from "lucide-react";
+import { ChevronLeft, ChevronRight, Save, RefreshCw } from "lucide-react";
 import { parseBagFormat } from "@/lib/bagFormatParser";
 
 interface LunchOrderRow {
@@ -32,6 +32,7 @@ export default function LunchOrdersPage() {
   const [currentDate, setCurrentDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [noOrders, setNoOrders] = useState(false);
   const [rawOrders, setRawOrders] = useState<DailyOrder[]>([]);
   const [filterDriverId, setFilterDriverId] = useState<string>('all');
@@ -170,14 +171,18 @@ export default function LunchOrdersPage() {
   };
 
   const handleGenerate = async () => {
+    if (hasChanges && !confirm('Generating orders will discard unsaved changes. Continue?')) return;
     try {
+      setGenerating(true);
       const start = new Date(currentDate);
       start.setHours(8, 0, 0, 0);
       await apiClient.generateDailyOrders({ date: currentDate, neaStartTime: start.toISOString() });
-      toast.success('Daily orders generated');
+      toast.success('Daily lunch orders generated');
       await loadOrders();
     } catch (e: any) {
-      toast.error(e?.message || 'Failed to generate orders');
+      toast.error(e?.message || 'Failed to generate lunch orders');
+    } finally {
+      setGenerating(false);
     }
   };
 

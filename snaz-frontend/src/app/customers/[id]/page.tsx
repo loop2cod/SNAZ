@@ -7,8 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ChevronLeft, ChevronRight, User, Package, Truck, Calendar } from "lucide-react";
-import { apiClient, Customer, DailyOrder } from "@/lib/api";
+import { ChevronLeft, ChevronRight, User, Truck, Calendar, Building2, Settings, Edit3, X } from "lucide-react";
+import { apiClient, Customer, DailyOrder, Company } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { parseBagFormat } from "@/lib/bagFormatParser";
 
@@ -16,12 +18,16 @@ interface MonthlyOrderData {
   [day: string]: {
     date: Date;
     lunch?: {
+      orderId: string;
+      orderItemId: string;
       bagFormat: string;
       nonVegCount: number;
       vegCount: number;
       totalCount: number;
     };
     dinner?: {
+      orderId: string;
+      orderItemId: string;
       bagFormat: string;
       nonVegCount: number;
       vegCount: number;
@@ -44,6 +50,10 @@ export default function CustomerDetailPage() {
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [showCompanyAssignment, setShowCompanyAssignment] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [pendingChanges, setPendingChanges] = useState<{[key: string]: {orderId: string, orderItemId: string, bagFormat: string}}>({});
 
   useEffect(() => {
     if (customerId) {
@@ -71,7 +81,6 @@ export default function CustomerDetailPage() {
       const year = currentMonth.getFullYear();
       const month = currentMonth.getMonth();
       
-      const startDate = new Date(year, month, 1);
       const endDate = new Date(year, month + 1, 0);
       
       // Format dates properly for API call
@@ -129,7 +138,7 @@ export default function CustomerDetailPage() {
           // Handle both string IDs and populated objects
           const orderCustomerId = typeof order.customerId === 'string' 
             ? order.customerId 
-            : order.customerId?._id || order.customerId;
+            : (order.customerId as any)?._id || order.customerId;
           const matches = orderCustomerId === customerId;
           console.log('Order match check:', { 
             orderCustomerId, 
@@ -150,6 +159,8 @@ export default function CustomerDetailPage() {
           customerOrders.forEach(order => {
             const parsed = parseBagFormat(order.bagFormat);
             const orderData = {
+              orderId: dayOrder._id,
+              orderItemId: order._id || '',
               bagFormat: order.bagFormat,
               nonVegCount: parsed.nonVegCount,
               vegCount: parsed.vegCount,
@@ -167,6 +178,8 @@ export default function CustomerDetailPage() {
       
       console.log('Final monthly data:', monthlyData);
       setMonthlyOrders(monthlyData);
+      setHasUnsavedChanges(false);
+      setPendingChanges({}); // Clear any pending changes when loading fresh data
     } catch (error) {
       console.error('Error loading monthly orders:', error);
       toast.error("Failed to load monthly orders");
@@ -236,12 +249,6 @@ export default function CustomerDetailPage() {
     });
   };
 
-  const getCurrentMonthDisplay = () => {
-    return currentMonth.toLocaleDateString('en-US', { 
-      month: 'long', 
-      year: 'numeric' 
-    });
-  };
 
   const formatMonthYear = () => {
     return currentMonth.toLocaleDateString('en-US', { 
@@ -253,6 +260,122 @@ export default function CustomerDetailPage() {
   const getDriverName = () => {
     if (!customer) return "N/A";
     return typeof customer.driverId === 'object' ? customer.driverId.name : "Unknown Driver";
+  };
+
+  const getCompanyName = () => {
+    if (!customer || !customer.companyId) return "No Company";
+    return typeof customer.companyId === 'object' ? customer.companyId.name : "Unknown Company";
+  };
+
+  const loadCompanies = async () => {
+    try {
+      const companiesData = await apiClient.getCompanies();
+      setCompanies(companiesData);
+    } catch (error) {
+      toast.error("Failed to load companies");
+    }
+  };
+
+  const handleCompanyAssignment = async (newCompanyId: string) => {
+    if (!customer) return;
+
+    try {
+      // Build a full, validated payload with ID fields normalized to strings
+      const normalizedDriverId = typeof customer.driverId === 'string' ? customer.driverId : customer.driverId?._id;
+      const normalizedPackages = (customer.packages || []).map((pkg) => ({
+        categoryId: typeof pkg.categoryId === 'string' ? pkg.categoryId : (pkg.categoryId as any)?._id,
+        unitPrice: pkg.unitPrice,
+      }));
+
+      const payload = {
+        name: customer.name,
+        address: customer.address,
+        phone: customer.phone,
+        email: customer.email,
+        driverId: normalizedDriverId as string,
+        packages: normalizedPackages,
+        dailyFood: {
+          lunch: customer.dailyFood?.lunch,
+          dinner: customer.dailyFood?.dinner,
+        },
+        startDate: customer.startDate,
+        endDate: customer.endDate,
+        companyId: newCompanyId === 'none' ? undefined : newCompanyId,
+        isActive: customer.isActive,
+      };
+
+      await apiClient.updateCustomer(customer._id, payload);
+
+      // Reload customer to get updated data with populated company
+      await loadCustomer();
+
+      toast.success(newCompanyId === 'none' ? 'Customer removed from company' : 'Customer assigned to company');
+      setShowCompanyAssignment(false);
+    } catch (error) {
+      toast.error('Failed to update customer company assignment');
+    }
+  };
+
+
+
+
+  const handleSaveAllChanges = async () => {
+    if (!hasUnsavedChanges || Object.keys(pendingChanges).length === 0) return;
+    
+    try {
+      // Save all pending changes to the backend
+      const savePromises = Object.values(pendingChanges).map(async (change) => {
+        return apiClient.updateOrderItem(change.orderId, change.orderItemId, {
+          bagFormat: change.bagFormat
+        });
+      });
+      
+      await Promise.all(savePromises);
+      
+      toast.success(`Successfully saved ${Object.keys(pendingChanges).length} bag format changes!`);
+      
+      // Reload the data to get the latest from backend
+      await loadMonthlyOrders();
+      
+      // Clear pending changes and unsaved flag
+      setPendingChanges({});
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      console.error('Failed to save changes:', error);
+      toast.error("Failed to save some changes. Please try again.");
+    }
+  };
+
+  const handleBagFormatChange = (day: string, mealType: 'lunch' | 'dinner', newValue: string) => {
+    const newOrders = { ...monthlyOrders };
+    const dayData = newOrders[day]?.[mealType];
+    
+    if (dayData) {
+      const parsed = parseBagFormat(newValue);
+      const changeKey = `${day}-${mealType}`;
+      
+      // Update the UI state immediately
+      newOrders[day][mealType] = {
+        ...dayData,
+        bagFormat: newValue,
+        nonVegCount: parsed.nonVegCount,
+        vegCount: parsed.vegCount,
+        totalCount: parsed.totalCount
+      };
+      
+      setMonthlyOrders(newOrders);
+      
+      // Track this change for backend save
+      const newPendingChanges = { ...pendingChanges };
+      newPendingChanges[changeKey] = {
+        orderId: dayData.orderId,
+        orderItemId: dayData.orderItemId,
+        bagFormat: newValue
+      };
+      
+      setPendingChanges(newPendingChanges);
+      setHasUnsavedChanges(true);
+    }
   };
 
   if (loading) {
@@ -306,8 +429,8 @@ export default function CustomerDetailPage() {
         </div>
 
         {/* Customer Info Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-          <Card className="p-4 col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <Card className="p-4 lg:col-span-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Truck className="h-4 w-4 text-muted-foreground" />
@@ -315,6 +438,27 @@ export default function CustomerDetailPage() {
               </div>
             </div>
             <div className="text-lg font-bold mt-1 truncate">{getDriverName()}</div>
+          </Card>
+
+          <Card className="p-4 lg:col-span-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Company</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={async () => {
+                  await loadCompanies();
+                  setShowCompanyAssignment(true);
+                }}
+                className="h-6 w-6 p-0"
+              >
+                <Settings className="h-3 w-3" />
+              </Button>
+            </div>
+            <div className="text-lg font-bold mt-1 truncate">{getCompanyName()}</div>
           </Card>
           
           <Card className="p-4">
@@ -330,6 +474,43 @@ export default function CustomerDetailPage() {
           </Card>
         </div>
 
+        {/* Company Assignment Modal */}
+        {showCompanyAssignment && (
+          <Card className="border-2 border-blue-200 bg-blue-50/30 py-2 gap-0">
+            <CardHeader className="">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Assign Customer to Company</CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => setShowCompanyAssignment(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Select Company:</label>
+                  <Select
+                    value={typeof customer?.companyId === 'string' ? customer.companyId : customer?.companyId?._id || 'none'}
+                    onValueChange={handleCompanyAssignment}
+                  >
+                    <SelectTrigger className="w-1/5">
+                      <SelectValue placeholder="Choose a company" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No Company</SelectItem>
+                      {companies.map(company => (
+                        <SelectItem key={company._id} value={company._id}>
+                          {company.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Monthly Orders Table */}
         <Card>
           <CardHeader className="pb-4">
@@ -340,7 +521,7 @@ export default function CustomerDetailPage() {
                   Orders for {formatMonthYear()}
                 </CardDescription>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -360,6 +541,16 @@ export default function CustomerDetailPage() {
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
+                {hasUnsavedChanges && (
+                  <Button 
+                    size="sm"
+                    onClick={handleSaveAllChanges}
+                    className="h-8 px-3 bg-green-600 hover:bg-green-700"
+                  >
+                    <Edit3 className="h-3 w-3 mr-1" />
+                    Save Changes
+                  </Button>
+                )}
               </div>
             </div>
           </CardHeader>
@@ -403,7 +594,16 @@ export default function CustomerDetailPage() {
                           
                           {/* Lunch columns */}
                           <TableCell className="font-mono text-xs px-2 py-3">
-                            {lunch?.bagFormat || "-"}
+                            {lunch ? (
+                              <div className="flex items-center gap-1">
+                                <Input
+                                  value={lunch.bagFormat}
+                                  onChange={(e) => handleBagFormatChange(day, 'lunch', e.target.value)}
+                                  className="h-6 text-xs font-mono border-slate-300 focus:border-orange-500"
+                                  placeholder="e.g., 5,5+7"
+                                />
+                              </div>
+                            ) : "-"}
                           </TableCell>
                           <TableCell className="text-center text-red-600 text-xs px-2 py-3 font-medium">
                             {lunch?.nonVegCount || 0}
@@ -417,7 +617,16 @@ export default function CustomerDetailPage() {
                           
                           {/* Dinner columns */}
                           <TableCell className="font-mono text-xs px-2 py-3">
-                            {dinner?.bagFormat || "-"}
+                            {dinner ? (
+                              <div className="flex items-center gap-1">
+                                <Input
+                                  value={dinner.bagFormat}
+                                  onChange={(e) => handleBagFormatChange(day, 'dinner', e.target.value)}
+                                  className="h-6 text-xs font-mono border-slate-300 focus:border-indigo-500"
+                                  placeholder="e.g., 3+5"
+                                />
+                              </div>
+                            ) : "-"}
                           </TableCell>
                           <TableCell className="text-center text-red-600 text-xs px-2 py-3 font-medium">
                             {dinner?.nonVegCount || 0}

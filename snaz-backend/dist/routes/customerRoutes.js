@@ -62,5 +62,18 @@ router.get('/:id', customerController.getCustomerById);
 router.post('/', validateCustomer, customerController.createCustomer);
 router.put('/:id', validateCustomer, customerController.updateCustomer);
 router.delete('/:id', customerController.deleteCustomer);
+// Daily food updates
+const validateDailyFoodPatch = [
+    (0, express_validator_1.body)('lunch').optional().isString().withMessage('Lunch must be a string'),
+    (0, express_validator_1.body)('dinner').optional().isString().withMessage('Dinner must be a string'),
+];
+const validateBulkDailyFood = [
+    (0, express_validator_1.body)('updates').isArray({ min: 1 }).withMessage('Updates array is required'),
+    (0, express_validator_1.body)('updates.*.customerId').isMongoId().withMessage('Valid customer ID is required'),
+    (0, express_validator_1.body)('updates.*.mealType').isIn(['lunch', 'dinner']).withMessage('mealType must be lunch or dinner'),
+    (0, express_validator_1.body)('updates.*.bagFormat').isString().withMessage('bagFormat must be a string'),
+];
+router.patch('/:id/daily-food', validateDailyFoodPatch, customerController.updateCustomerDailyFood);
+router.patch('/bulk-update-daily-food', validateBulkDailyFood, customerController.bulkUpdateCustomerDailyFood);
 exports.default = router;
 //# sourceMappingURL=customerRoutes.js.map

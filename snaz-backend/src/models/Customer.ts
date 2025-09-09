@@ -15,6 +15,7 @@ export interface ICustomer extends Document {
   address: string;
   phone?: string;
   email?: string;
+  companyId?: mongoose.Types.ObjectId;
   driverId: mongoose.Types.ObjectId;
   packages: ICustomerPackage[];
   dailyFood: IDailyFood;
@@ -69,6 +70,10 @@ const CustomerSchema: Schema = new Schema({
   email: {
     type: String,
     trim: true
+  },
+  companyId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Company'
   },
   driverId: {
     type: Schema.Types.ObjectId,

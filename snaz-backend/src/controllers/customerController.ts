@@ -7,6 +7,7 @@ export const getAllCustomers = async (req: Request, res: Response) => {
   try {
     const customers = await Customer.find({ isActive: true })
       .populate('driverId', 'name route')
+      .populate('companyId', 'name')
       .populate('packages.categoryId', 'name')
       .sort({ name: 1 });
     res.json({ success: true, data: customers });
@@ -20,6 +21,7 @@ export const getCustomerById = async (req: Request, res: Response) => {
   try {
     const customer = await Customer.findById(req.params.id)
       .populate('driverId', 'name route')
+      .populate('companyId', 'name')
       .populate('packages.categoryId', 'name');
       
     if (!customer) {
@@ -53,13 +55,14 @@ export const createCustomer = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { name, address, phone, email, driverId, packages, dailyFood, startDate, endDate } = req.body;
+    const { name, address, phone, email, companyId, driverId, packages, dailyFood, startDate, endDate } = req.body;
     
     const customer = new Customer({
       name,
       address,
       phone,
       email,
+      companyId,
       driverId,
       packages,
       dailyFood,
@@ -85,11 +88,11 @@ export const updateCustomer = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { name, address, phone, email, driverId, packages, dailyFood, startDate, endDate, isActive } = req.body;
+    const { name, address, phone, email, companyId, driverId, packages, dailyFood, startDate, endDate, isActive } = req.body;
     
     const customer = await Customer.findByIdAndUpdate(
       req.params.id,
-      { name, address, phone, email, driverId, packages, dailyFood, startDate, endDate, isActive },
+      { name, address, phone, email, companyId, driverId, packages, dailyFood, startDate, endDate, isActive },
       { new: true, runValidators: true }
     ).populate('driverId', 'name route')
      .populate('packages.categoryId', 'name');

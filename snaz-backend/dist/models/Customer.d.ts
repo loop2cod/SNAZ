@@ -12,6 +12,7 @@ export interface ICustomer extends Document {
     address: string;
     phone?: string;
     email?: string;
+    companyId?: mongoose.Types.ObjectId;
     driverId: mongoose.Types.ObjectId;
     packages: ICustomerPackage[];
     dailyFood: IDailyFood;

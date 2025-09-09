@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Moon } from "lucide-react";
 
 interface DinnerOrderData {
@@ -69,115 +70,126 @@ export function DinnerOrdersTable({
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="overflow-auto border rounded-lg">
-          {/* Table Header */}
-          <div className="grid grid-cols-8 gap-0 bg-slate-100 border-b font-medium text-xs sticky top-0 min-w-[1000px]">
-            <div className="px-2 py-1.5 border-r">#</div>
-            <div className="px-2 py-1.5 border-r">Customer</div>
-            <div className="px-2 py-1.5 border-r hidden md:block">Driver</div>
-            <div className="px-2 py-1.5 border-r hidden md:block">Category</div>
-            <div className="px-2 py-1.5 border-r">Bag Format</div>
-            <div className="px-2 py-1.5 border-r hidden sm:block">Non‑Veg</div>
-            <div className="px-2 py-1.5 border-r hidden sm:block">Veg</div>
-            <div className="px-2 py-1.5">Total</div>
-          </div>
-
-          {/* Table Body */}
-          <div className="bg-white min-w-[1000px]">
-            {data.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">
-                No customers found for dinner orders
-              </div>
-            ) : (
-              data.map((row, index) => {
-                return (
-                  <div key={row.customerId} className="grid grid-cols-8 gap-0 border-b hover:bg-slate-50 text-sm">
+      <CardContent className="p-0">
+        <div className="overflow-auto">
+          <Table className="border-collapse">
+            <TableHeader>
+              <TableRow className="bg-slate-50 hover:bg-slate-50 border-b">
+                <TableHead className="w-12 text-center font-semibold text-slate-700 border-r text-xs">#</TableHead>
+                <TableHead className="min-w-[140px] font-semibold text-slate-700 border-r text-xs">Customer</TableHead>
+                <TableHead className="min-w-[100px] font-semibold text-slate-700 border-r text-xs hidden md:table-cell">Driver</TableHead>
+                <TableHead className="min-w-[100px] font-semibold text-slate-700 border-r text-xs hidden md:table-cell">Category</TableHead>
+                <TableHead className="min-w-[120px] font-semibold text-slate-700 border-r text-xs">Bag Format</TableHead>
+                <TableHead className="w-20 text-center font-semibold text-red-700 border-r text-xs hidden sm:table-cell">Non-Veg</TableHead>
+                <TableHead className="w-20 text-center font-semibold text-green-700 border-r text-xs hidden sm:table-cell">Veg</TableHead>
+                <TableHead className="w-20 text-center font-semibold text-indigo-700 text-xs">Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    No customers found for dinner orders
+                  </TableCell>
+                </TableRow>
+              ) : (
+                data.map((row, index) => (
+                  <TableRow key={row.customerId} className="hover:bg-slate-50/50 border-b">
                     {/* Row Number */}
-                    <div className="px-2 py-2 border-r text-[11px] text-muted-foreground font-mono">
+                    <TableCell className="text-center text-xs text-muted-foreground font-mono border-r bg-slate-50/30">
                       {index + 1}
-                    </div>
+                    </TableCell>
 
                     {/* Customer Name */}
-                    <div className="px-2 py-2 border-r">
-                      <div className="font-medium text-sm truncate" title={row.customerName}>{row.customerName}</div>
-                    </div>
+                    <TableCell className="font-medium text-sm border-r">
+                      <div className="truncate" title={row.customerName}>
+                        {row.customerName}
+                      </div>
+                    </TableCell>
 
                     {/* Driver Name */}
-                    <div className="px-2 py-2 border-r hidden md:block">
-                      <div className="text-xs text-muted-foreground truncate" title={row.driverName}>{row.driverName}</div>
-                    </div>
+                    <TableCell className="text-xs text-muted-foreground border-r hidden md:table-cell">
+                      <div className="truncate" title={row.driverName}>
+                        {row.driverName}
+                      </div>
+                    </TableCell>
 
                     {/* Category Name */}
-                    <div className="px-2 py-2 border-r hidden md:block">
-                      <div className="text-xs text-slate-700 bg-slate-50 px-2 py-0.5 rounded truncate" title={row.categoryName}>{row.categoryName}</div>
-                    </div>
+                    <TableCell className="border-r hidden md:table-cell">
+                      <div className="text-xs bg-slate-100 px-2 py-1 rounded text-slate-700 truncate" title={row.categoryName}>
+                        {row.categoryName}
+                      </div>
+                    </TableCell>
 
                     {/* Bag Format - Editable */}
-                    <div className="px-2 py-1.5 border-r">
+                    <TableCell className="border-r p-1">
                       <Input
                         value={row.bagFormat}
                         onChange={(e) => handleBagFormatChange(row.customerId, e.target.value)}
-                        className="h-7 text-xs font-mono border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200"
+                        className="h-8 text-xs font-mono border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200 bg-white"
                         placeholder="e.g., 3+5"
                       />
-                    </div>
+                    </TableCell>
 
                     {/* Non-Veg Count - Read Only */}
-                    <div className="px-2 py-2 border-r hidden sm:block">
-                      <div className="text-xs text-center font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded">
+                    <TableCell className="text-center border-r hidden sm:table-cell">
+                      <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-red-700 bg-red-100 rounded">
                         {row.nonVegCount}
                       </div>
-                    </div>
+                    </TableCell>
 
                     {/* Veg Count - Read Only */}
-                    <div className="px-2 py-2 border-r hidden sm:block">
-                      <div className="text-xs text-center font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">
+                    <TableCell className="text-center border-r hidden sm:table-cell">
+                      <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-green-700 bg-green-100 rounded">
                         {row.vegCount}
                       </div>
-                    </div>
+                    </TableCell>
 
                     {/* Total Count - Read Only */}
-                    <div className="px-2 py-2">
-                      <div className="text-xs text-center font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                    <TableCell className="text-center">
+                      <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-indigo-700 bg-indigo-100 rounded">
                         {row.totalCount}
                       </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
 
-        {/* Summary Row */}
+        {/* Summary Row - Spreadsheet Style */}
         {data.length > 0 && (
-          <div className="mt-4 bg-slate-50 rounded-lg p-4 border">
-            <div className="grid grid-cols-4 gap-4 text-sm">
-              <div className="text-center">
-                <div className="font-semibold text-slate-600">Total Customers</div>
-                <div className="text-lg font-bold text-slate-800">{data.length}</div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold text-red-600">Total Non-Veg</div>
-                <div className="text-lg font-bold text-red-700">
-                  {data.reduce((sum, row) => sum + row.nonVegCount, 0)}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold text-green-600">Total Veg</div>
-                <div className="text-lg font-bold text-green-700">
-                  {data.reduce((sum, row) => sum + row.vegCount, 0)}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-semibold text-indigo-600">Grand Total</div>
-                <div className="text-lg font-bold text-indigo-700">
-                  {data.reduce((sum, row) => sum + row.totalCount, 0)}
-                </div>
-              </div>
-            </div>
-          </div>
+          <Table className="border-t-2 border-slate-300">
+            <TableBody>
+              <TableRow className="bg-indigo-50 hover:bg-indigo-50 border-b font-semibold">
+                <TableCell className="text-center text-xs border-r bg-slate-100">∑</TableCell>
+                <TableCell className="font-bold text-sm border-r">
+                  TOTALS ({data.length} customers)
+                </TableCell>
+                <TableCell className="border-r hidden md:table-cell"></TableCell>
+                <TableCell className="border-r hidden md:table-cell"></TableCell>
+                <TableCell className="border-r text-center text-xs font-bold text-slate-600">
+                  Summary
+                </TableCell>
+                <TableCell className="text-center border-r hidden sm:table-cell">
+                  <div className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-red-800 bg-red-200 rounded">
+                    {data.reduce((sum, row) => sum + row.nonVegCount, 0)}
+                  </div>
+                </TableCell>
+                <TableCell className="text-center border-r hidden sm:table-cell">
+                  <div className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-green-800 bg-green-200 rounded">
+                    {data.reduce((sum, row) => sum + row.vegCount, 0)}
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-indigo-800 bg-indigo-200 rounded">
+                    {data.reduce((sum, row) => sum + row.totalCount, 0)}
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         )}
       </CardContent>
     </Card>

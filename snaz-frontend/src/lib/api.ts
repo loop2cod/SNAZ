@@ -20,6 +20,18 @@ export interface FoodCategory {
   updatedAt: string;
 }
 
+export interface Company {
+  _id: string;
+  name: string;
+  address: string;
+  phone?: string;
+  email?: string;
+  contactPerson?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CustomerPackage {
   categoryId: string | FoodCategory;
   unitPrice: number;
@@ -31,6 +43,7 @@ export interface Customer {
   address: string;
   phone?: string;
   email?: string;
+  companyId?: string | Company;
   driverId: string | Driver;
   packages: CustomerPackage[];
   dailyFood: {
@@ -155,6 +168,44 @@ class ApiClient {
     await this.request(`/food-categories/${id}`, {
       method: 'DELETE',
     });
+  }
+
+  // Companies
+  async getCompanies(): Promise<Company[]> {
+    const response = await this.request<Company[]>('/companies');
+    return response.data;
+  }
+
+  async getCompany(id: string): Promise<Company> {
+    const response = await this.request<Company>(`/companies/${id}`);
+    return response.data;
+  }
+
+  async createCompany(company: Partial<Company>): Promise<Company> {
+    const response = await this.request<Company>('/companies', {
+      method: 'POST',
+      body: JSON.stringify(company),
+    });
+    return response.data;
+  }
+
+  async updateCompany(id: string, company: Partial<Company>): Promise<Company> {
+    const response = await this.request<Company>(`/companies/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(company),
+    });
+    return response.data;
+  }
+
+  async deleteCompany(id: string): Promise<void> {
+    await this.request(`/companies/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getCompanyCustomers(companyId: string): Promise<Customer[]> {
+    const response = await this.request<Customer[]>(`/companies/${companyId}/customers`);
+    return response.data;
   }
 
   // Customers
