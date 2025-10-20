@@ -93,7 +93,7 @@ export default function CompaniesPage() {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRoles={['admin', 'manager']}>
       <MainLayout>
       <div className="space-y-6">
         {/* Header */}

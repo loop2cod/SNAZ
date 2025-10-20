@@ -19,7 +19,8 @@ import {
   Sun,
   Moon,
   Building2,
-  LogOut
+  LogOut,
+  Settings
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -27,52 +28,68 @@ const navigationItems = [
   {
     title: "Dashboard",
     href: "/",
-    icon: Home
+    icon: Home,
+    roles: ["admin", "manager"]
   },
   {
     title: "Analytics", 
     href: "/analytics",
-    icon: BarChart
+    icon: BarChart,
+    roles: ["admin", "manager"]
   },
   {
     title: "Drivers",
     href: "/drivers",
-    icon: Truck
+    icon: Truck,
+    roles: ["admin", "manager"]
   },
   {
     title: "Companies",
     href: "/companies",
-    icon: Building2
+    icon: Building2,
+    roles: ["admin", "manager"]
   },
   {
     title: "Customers",
     href: "/customers", 
-    icon: Users
+    icon: Users,
+    roles: ["admin", "manager"]
   },
   {
     title: "Food Categories",
     href: "/categories",
-    icon: Package
+    icon: Package,
+    roles: ["admin", "manager", "staff"]
   },
   {
     title: "Lunch Orders",
     href: "/orders/lunch",
-    icon: Sun
+    icon: Sun,
+    roles: ["admin", "manager", "staff"]
   },
   {
     title: "Dinner Orders",
     href: "/orders/dinner",
-    icon: Moon
+    icon: Moon,
+    roles: ["admin", "manager", "staff"]
   },
   {
     title: "Bills",
     href: "/bills",
-    icon: FileText
+    icon: FileText,
+    roles: ["admin", "manager"]
   },
   {
     title: "Payments",
     href: "/payments",
-    icon: DollarSign
+    icon: DollarSign,
+    roles: ["admin", "manager"]
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: Settings,
+    roles: ["admin"]
   }
 ];
 
@@ -132,31 +149,33 @@ export default function Sidebar() {
           {/* Navigation */}
           <nav className="flex-1 px-3 py-3">
             <ul className="space-y-1.5">
-              {navigationItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-                
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className={cn(
-                        "flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                        isActive 
-                          ? "bg-blue-50 text-blue-700 border border-blue-200" 
-                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                      )}
-                    >
-                      <Icon className={cn(
-                        "w-4 h-4",
-                        isActive ? "text-blue-700" : "text-gray-500"
-                      )} />
-                      <span>{item.title}</span>
-                    </Link>
-                  </li>
-                );
-              })}
+              {navigationItems
+                .filter(item => user?.role && item.roles.includes(user.role))
+                .map((item) => {
+                  const Icon = item.icon;
+                  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                  
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                          isActive 
+                            ? "bg-blue-50 text-blue-700 border border-blue-200" 
+                            : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        )}
+                      >
+                        <Icon className={cn(
+                          "w-4 h-4",
+                          isActive ? "text-blue-700" : "text-gray-500"
+                        )} />
+                        <span>{item.title}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
             </ul>
           </nav>
 

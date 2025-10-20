@@ -84,7 +84,7 @@ export default function BillsPage() {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRoles={['admin', 'manager']}>
     <MainLayout>
     <div className="space-y-4">
       <Card>

@@ -6,7 +6,7 @@ import AnalyticsDashboard from "@/components/analytics/AnalyticsDashboard";
 
 export default function AnalyticsPage() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRoles={['admin', 'manager']}>
     <MainLayout>
       <div className="space-y-6">
         <div>

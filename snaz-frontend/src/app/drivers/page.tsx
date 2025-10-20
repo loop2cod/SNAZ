@@ -97,7 +97,7 @@ export default function DriversPage() {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRoles={['admin', 'manager']}>
       <MainLayout>
       <div className="space-y-6">
         {/* Header */}

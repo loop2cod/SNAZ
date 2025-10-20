@@ -5,7 +5,12 @@ import {
   login,
   getProfile,
   updateProfile,
-  changePassword
+  changePassword,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deactivateUser,
+  resetUserPassword
 } from '../controllers/authController';
 import { authenticateToken, requireRole } from '../middleware/auth';
 
@@ -71,5 +76,12 @@ router.post('/register', authenticateToken, requireRole(['admin']), registerVali
 router.get('/profile', authenticateToken, getProfile);
 router.put('/profile', authenticateToken, updateProfileValidation, updateProfile);
 router.put('/change-password', authenticateToken, changePasswordValidation, changePassword);
+
+// Admin-only user management routes
+router.get('/users', authenticateToken, requireRole(['admin']), getAllUsers);
+router.get('/users/:id', authenticateToken, requireRole(['admin']), getUserById);
+router.put('/users/:id', authenticateToken, requireRole(['admin']), updateProfileValidation, updateUser);
+router.patch('/users/:id/deactivate', authenticateToken, requireRole(['admin']), deactivateUser);
+router.patch('/users/:id/reset-password', authenticateToken, requireRole(['admin']), resetUserPassword);
 
 export default router;

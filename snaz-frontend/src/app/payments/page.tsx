@@ -34,7 +34,7 @@ export default function PaymentsPage() {
   useEffect(() => { load(); }, []);
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRoles={['admin', 'manager']}>
     <MainLayout>
     <Card>
       <CardHeader className="flex items-center justify-between">

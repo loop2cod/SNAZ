@@ -6,10 +6,10 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'admin' | 'manager' | 'staff';
+  requiredRoles?: ('admin' | 'manager' | 'staff')[];
 }
 
-export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children, requiredRoles }: ProtectedRouteProps) {
   const { user, isAuthenticated, loading } = useAuth();
   const router = useRouter();
 
@@ -20,13 +20,12 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
         return;
       }
 
-      if (requiredRole && user?.role !== requiredRole && user?.role !== 'admin') {
-        // Admin can access everything, others need specific roles
+      if (requiredRoles && user?.role && !requiredRoles.includes(user.role)) {
         router.push('/unauthorized');
         return;
       }
     }
-  }, [isAuthenticated, loading, user, router, requiredRole]);
+  }, [isAuthenticated, loading, user, router, requiredRoles]);
 
   if (loading) {
     return (
@@ -40,7 +39,7 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
     return null; // Will redirect to login
   }
 
-  if (requiredRole && user?.role !== requiredRole && user?.role !== 'admin') {
+  if (requiredRoles && user?.role && !requiredRoles.includes(user.role)) {
     return null; // Will redirect to unauthorized
   }
 

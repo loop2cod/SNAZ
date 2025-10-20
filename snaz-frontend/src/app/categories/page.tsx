@@ -6,7 +6,7 @@ import FoodCategoriesManagement from "@/components/food-categories/FoodCategorie
 
 export default function CategoriesPage() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRoles={['admin', 'manager', 'staff']}>
     <MainLayout>
       <div className="space-y-6">
         <div>

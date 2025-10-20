@@ -86,6 +86,17 @@ export interface DailyOrder {
   updatedAt: string;
 }
 
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: 'admin' | 'manager' | 'staff';
+  isActive: boolean;
+  lastLogin?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -411,6 +422,45 @@ class ApiClient {
     const response = await this.request('/auth/change-password', {
       method: 'PUT',
       body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    return response.data;
+  }
+
+  // User Management (Admin only)
+  async getUsers(): Promise<User[]> {
+    const response = await this.request<User[]>('/auth/users');
+    return response.data;
+  }
+
+  async getUser(id: string): Promise<User> {
+    const response = await this.request<User>(`/auth/users/${id}`);
+    return response.data;
+  }
+
+  async updateUser(id: string, userData: { 
+    username?: string; 
+    email?: string; 
+    role?: string; 
+    isActive?: boolean; 
+  }): Promise<User> {
+    const response = await this.request<User>(`/auth/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+    return response.data;
+  }
+
+  async toggleUserStatus(id: string): Promise<User> {
+    const response = await this.request<User>(`/auth/users/${id}/deactivate`, {
+      method: 'PATCH',
+    });
+    return response.data;
+  }
+
+  async resetUserPassword(id: string, newPassword: string): Promise<User> {
+    const response = await this.request<User>(`/auth/users/${id}/reset-password`, {
+      method: 'PATCH',
+      body: JSON.stringify({ newPassword }),
     });
     return response.data;
   }

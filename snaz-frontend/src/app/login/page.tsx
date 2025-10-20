@@ -39,14 +39,18 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   
   const router = useRouter();
-  const { login, isAuthenticated, loading: authLoading } = useAuth();
+  const { login, isAuthenticated, loading: authLoading, user } = useAuth();
 
-  // Redirect authenticated users to dashboard
+  // Redirect authenticated users based on role
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      router.push('/');
+    if (!authLoading && isAuthenticated && user) {
+      if (user.role === 'staff') {
+        router.push('/orders/lunch');
+      } else {
+        router.push('/');
+      }
     }
-  }, [isAuthenticated, authLoading, router]);
+  }, [isAuthenticated, authLoading, user, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -69,8 +73,12 @@ export default function LoginPage() {
       
       toast.success('Login successful!');
       
-      // Redirect to dashboard
-      router.push('/');
+      // Redirect based on user role
+      if (result.user.role === 'staff') {
+        router.push('/orders/lunch');
+      } else {
+        router.push('/');
+      }
     } catch (error) {
       console.error('Login error:', error);
       setError('Invalid credentials. Please try again.');

@@ -1,14 +1,27 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import MainLayout from "@/components/layout/MainLayout";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, Users, Truck, Package, DollarSign, FileText, TrendingUp } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // Redirect staff users to their first available page
+  useEffect(() => {
+    if (!loading && user?.role === 'staff') {
+      router.push('/orders/lunch');
+    }
+  }, [user, loading, router]);
+
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRoles={['admin', 'manager']}>
       <MainLayout>
       <div className="space-y-6">
         {/* Header */}

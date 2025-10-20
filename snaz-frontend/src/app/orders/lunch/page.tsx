@@ -188,7 +188,7 @@ export default function LunchOrdersPage() {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRoles={['admin', 'manager', 'staff']}>
     <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
