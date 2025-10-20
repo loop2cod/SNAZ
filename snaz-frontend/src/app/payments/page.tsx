@@ -24,7 +24,7 @@ export default function PaymentsPage() {
 
   const load = async () => {
     try {
-      const data = await apiClient.getPayments(filters);
+      const data:any = await apiClient.getPayments(filters);
       setPayments(data);
     } catch (e: any) {
       toast.error(e.message || 'Failed to load payments');

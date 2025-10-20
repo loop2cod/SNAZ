@@ -127,7 +127,7 @@ export default function AnalyticsDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today's Food Items</CardTitle>
+              <CardTitle className="text-sm font-medium">Today&apos;s Food Items</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -141,7 +141,7 @@ export default function AnalyticsDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today's Revenue</CardTitle>
+              <CardTitle className="text-sm font-medium">Today&apos;s Revenue</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -283,7 +283,7 @@ export default function AnalyticsDashboard() {
       {dailyAnalytics && dailyAnalytics.driverBreakdown && dailyAnalytics.driverBreakdown.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Today's Driver Breakdown</CardTitle>
+            <CardTitle>Today&apos;s Driver Breakdown</CardTitle>
             <CardDescription>Current day performance by driver</CardDescription>
           </CardHeader>
           <CardContent>

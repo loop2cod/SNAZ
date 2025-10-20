@@ -24,6 +24,7 @@ export default function CustomersManagement() {
   const [formData, setFormData] = useState({
     name: "",
     address: "",
+    email: "",
     phone: "",
     driverId: "",
     packages: [{ categoryId: "", unitPrice: 0 }],
@@ -102,6 +103,7 @@ export default function CustomersManagement() {
       name: customer.name,
       address: customer.address,
       phone: customer.phone || "",
+      email: customer.email || "",
       driverId: typeof customer.driverId === 'string' ? customer.driverId : customer.driverId._id,
       packages: customer.packages.map(pkg => ({
         categoryId: typeof pkg.categoryId === 'string' ? pkg.categoryId : pkg.categoryId._id,
@@ -150,6 +152,7 @@ export default function CustomersManagement() {
     setFormData({
       name: "",
       address: "",
+      email: "",
       phone: "",
       driverId: "",
       packages: [{ categoryId: "", unitPrice: 0 }],
@@ -317,7 +320,7 @@ export default function CustomersManagement() {
                             })}
                             required
                           />
-                          <p className="text-xs text-gray-500 mt-1">Format: Non-veg counts + veg count (e.g., "5,5+7" = 10 non-veg + 7 veg)</p>
+                          <p className="text-xs text-gray-500 mt-1">Format: Non-veg counts + veg count (e.g., &quot;5,5+7&quot; = 10 non-veg + 7 veg)</p>
                         </div>
                         <div>
                           <Label htmlFor="dinner" className="text-sm">Dinner (Bag Format)</Label>

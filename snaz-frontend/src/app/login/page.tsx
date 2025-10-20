@@ -62,7 +62,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const result = await apiClient.login(formData.username, formData.password);
+      const result:any = await apiClient.login(formData.username, formData.password);
       
       // Use AuthContext login method to update state and localStorage
       login(result.token, result.user);

@@ -322,14 +322,16 @@ class ApiClient {
   }
 
   async getBills(params?: { entityType?: 'customer' | 'company'; entityId?: string; year?: number; month?: number; status?: string }) {
-    const qs = params ? '?' + new URLSearchParams(Object.fromEntries(Object.entries(params).map(([k,v]) => [k, String(v)]))) : '';
-    const response = await this.request(`/billing${qs}`);
-    return response.data;
+    const qs = params
+      ? '?' + new URLSearchParams(Object.fromEntries(Object.entries(params).map(([key, value]) => [key, String(value)])))
+      : '';
+    const response = await this.request('/billing' + qs);
+    return response.data as any;
   }
 
   async getBill(id: string) {
     const response = await this.request(`/billing/${id}`);
-    return response.data;
+    return response.data as any;
   }
 
   async getLedger(params: { entityType: 'customer' | 'company'; entityId: string }) {

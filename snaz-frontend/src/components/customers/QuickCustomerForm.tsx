@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, X, User, MapPin, Phone, Truck, Package, Utensils, Calendar } from "lucide-react";
+import { Save, X, User} from "lucide-react";
 import { Driver, FoodCategory } from "@/lib/api";
 
 interface QuickCustomerFormProps {

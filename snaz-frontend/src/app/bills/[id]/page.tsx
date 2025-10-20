@@ -36,7 +36,7 @@ export default function BillDetailPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const data = await apiClient.getBill(id);
+      const data:any = await apiClient.getBill(id);
       setBill(data);
     } catch (e: any) {
       toast.error(e.message || 'Failed to load bill');

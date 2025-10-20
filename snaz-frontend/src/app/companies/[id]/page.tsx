@@ -86,7 +86,7 @@ export default function CompanyDetailPage() {
 
   const loadBilling = async () => {
     try {
-      const [bills, payments] = await Promise.all([
+      const [bills, payments]:any = await Promise.all([
         apiClient.getBills({ entityType: 'company', entityId: companyId }),
         apiClient.getPayments({ entityType: 'company', entityId: companyId })
       ]);

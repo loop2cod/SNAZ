@@ -41,23 +41,23 @@ export default function BillsPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const data: Bill[] = await apiClient.getBills();
+      const data: any = await apiClient.getBills();
       // If backend didn't include names, enrich on client
-      const needNames = data.filter(b => !b.entityName);
+      const needNames = data.filter((b:any)=> !b.entityName);
       if (needNames.length > 0) {
-        const custIds = Array.from(new Set(needNames.filter(b => b.entityType === 'customer').map(b => b.entityId)));
-        const compIds = Array.from(new Set(needNames.filter(b => b.entityType === 'company').map(b => b.entityId)));
+        const custIds = Array.from(new Set(needNames.filter((b:any) => b.entityType === 'customer').map((b:any) => b.entityId)));
+        const compIds = Array.from(new Set(needNames.filter((b:any) => b.entityType === 'company').map((b:any) => b.entityId)));
         const nameMap = new Map<string, string>();
         // Fetch names individually to avoid downloading all
         await Promise.all([
-          ...custIds.map(async (id) => {
+          ...custIds.map(async (id:any) => {
             try { const c = await apiClient.getCustomer(id); nameMap.set(id, c.name); } catch {}
           }),
-          ...compIds.map(async (id) => {
+          ...compIds.map(async (id:any) => {
             try { const c = await apiClient.getCompany(id); nameMap.set(id, c.name); } catch {}
           })
         ]);
-        const enriched = data.map(b => ({ ...b, entityName: b.entityName || nameMap.get(b.entityId) }));
+        const enriched = data.map((b:any) => ({ ...b, entityName: b.entityName || nameMap.get(b.entityId) }));
         setBills(enriched);
       } else {
         setBills(data);

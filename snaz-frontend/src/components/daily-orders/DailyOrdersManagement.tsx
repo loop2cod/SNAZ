@@ -436,7 +436,7 @@ export default function DailyOrdersManagement() {
               <div className="col-span-4 text-sm text-gray-500">
                 Format: Non-veg counts separated by commas + veg count
                 <br />
-                Example: "5,5+7" = 5 + 5 non-veg bags + 7 veg bags = 17 total
+                Example: &quot;5,5+7&quot; = 5 + 5 non-veg bags + 7 veg bags = 17 total
               </div>
             </div>
             <DialogFooter>
