@@ -310,6 +310,11 @@ class ApiClient {
   }
 
   // Analytics
+  async getDashboardData() {
+    const response = await this.request('/analytics/dashboard');
+    return response.data;
+  }
+
   async getDailyAnalytics(date: string) {
     const response = await this.request(`/analytics/daily?date=${date}`);
     return response.data;

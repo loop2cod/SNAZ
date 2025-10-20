@@ -31,6 +31,7 @@ const validateBagFormat = [
 ];
 
 // Routes
+router.get('/dashboard', analyticsController.getDashboardData);
 router.get('/daily', validateDailyAnalytics, analyticsController.getDailyAnalytics);
 router.get('/range', validateRangeAnalytics, analyticsController.getRangeAnalytics);
 router.get('/customer/:customerId/monthly', validateCustomerMonthly, analyticsController.getCustomerMonthlyReport);
