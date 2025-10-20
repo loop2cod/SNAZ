@@ -6,7 +6,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Users, Truck, Package, DollarSign, FileText, TrendingUp, RefreshCw } from "lucide-react";
+import { CalendarDays, Users, Truck, Package, DollarSign, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
@@ -212,7 +212,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -272,35 +272,6 @@ export default function Dashboard() {
                   No drivers available
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2" />
-                Performance
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span>Orders Completed</span>
-                <span className="font-semibold text-green-600">
-                  {dashboardData?.performance.completionRate || 0}%
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span>On-Time Delivery</span>
-                <span className="font-semibold text-blue-600">
-                  {dashboardData?.performance.onTimeDelivery || 0}%
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span>Customer Satisfaction</span>
-                <span className="font-semibold text-yellow-600">
-                  {dashboardData?.performance.customerSatisfaction || 0}/5
-                </span>
-              </div>
             </CardContent>
           </Card>
         </div>
