@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { LunchOrdersTable } from "@/components/orders/LunchOrdersTable";
+import { NeaStickerGenerator } from "@/components/orders/NeaStickerGenerator";
 import { apiClient, DailyOrder } from "@/lib/api";
 import { ExcelExporter } from "@/lib/excel-export";
 import { toast } from "sonner";
@@ -241,21 +242,26 @@ export default function LunchOrdersPage() {
             <Button size="sm" onClick={handleGenerate}>Generate Orders</Button>
           </div>
         ) : (
-          <LunchOrdersTable
-            data={filteredData.map(r => ({
-              customerId: r.customerId,
-              customerName: r.customerName,
-              driverName: r.driverName,
-              categoryName: r.categoryName,
-              bagFormat: r.bagFormat,
-              nonVegCount: r.nonVegCount,
-              vegCount: r.vegCount,
-              totalCount: r.totalCount,
-            }))}
-            loading={loading}
-            onOrderChange={handleOrderChange}
-            onExport={handleExport}
-          />
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <NeaStickerGenerator mealType="lunch" orderData={filteredData} />
+            </div>
+            <LunchOrdersTable
+              data={filteredData.map(r => ({
+                customerId: r.customerId,
+                customerName: r.customerName,
+                driverName: r.driverName,
+                categoryName: r.categoryName,
+                bagFormat: r.bagFormat,
+                nonVegCount: r.nonVegCount,
+                vegCount: r.vegCount,
+                totalCount: r.totalCount,
+              }))}
+              loading={loading}
+              onOrderChange={handleOrderChange}
+              onExport={handleExport}
+            />
+          </div>
         )}
       </div>
     </MainLayout>

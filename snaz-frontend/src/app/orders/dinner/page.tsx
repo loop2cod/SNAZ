@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { DinnerOrdersTable } from "@/components/orders/DinnerOrdersTable";
+import { NeaStickerGenerator } from "@/components/orders/NeaStickerGenerator";
 import { apiClient, DailyOrder } from "@/lib/api";
 import { ExcelExporter } from "@/lib/excel-export";
 import { toast } from "sonner";
@@ -238,21 +239,26 @@ export default function DinnerOrdersPage() {
             <Button size="sm" onClick={handleGenerate}>Generate Orders</Button>
           </div>
         ) : (
-          <DinnerOrdersTable
-            data={filteredData.map((r: any) => ({
-              customerId: r.customerId,
-              customerName: r.customerName,
-              categoryName: r.categoryName,
-              driverName: r.driverName,
-              bagFormat: r.bagFormat,
-              nonVegCount: r.nonVegCount,
-              vegCount: r.vegCount,
-              totalCount: r.totalCount,
-            }))}
-            loading={loading}
-            onOrderChange={handleOrderChange}
-            onExport={handleExport}
-          />
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <NeaStickerGenerator mealType="dinner" orderData={filteredData} />
+            </div>
+            <DinnerOrdersTable
+              data={filteredData.map((r: any) => ({
+                customerId: r.customerId,
+                customerName: r.customerName,
+                categoryName: r.categoryName,
+                driverName: r.driverName,
+                bagFormat: r.bagFormat,
+                nonVegCount: r.nonVegCount,
+                vegCount: r.vegCount,
+                totalCount: r.totalCount,
+              }))}
+              loading={loading}
+              onOrderChange={handleOrderChange}
+              onExport={handleExport}
+            />
+          </div>
         )}
       </div>
     </MainLayout>
