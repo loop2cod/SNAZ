@@ -170,7 +170,7 @@ export default function CompanyDetailPage() {
         categoryId: typeof pkg.categoryId === 'string' ? pkg.categoryId : pkg.categoryId._id,
         unitPrice: pkg.unitPrice
       })),
-      dailyFood: customer.dailyFood,
+      dailyFood: customer.dailyFood || { lunch: "", dinner: "" },
       startDate: customer.startDate.split('T')[0],
       endDate: customer.endDate ? customer.endDate.split('T')[0] : ""
     });

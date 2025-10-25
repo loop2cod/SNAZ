@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://server.shaficatering.com/api';
+const API_BASE_URL = 'https://server.shaficatering.com/api';
 
 export interface Driver {
   _id: string;

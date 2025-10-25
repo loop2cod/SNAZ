@@ -391,8 +391,8 @@ export function CustomersDataTable({
                     <Table className="min-w-[900px] md:min-w-0">
                       <TableHeader>
                         <TableRow className="bg-muted/50">
-                          {columns.filter(col => col.id !== 'companyId' && col.accessorKey !== 'companyId' && col.id !== 'select').map((col) => (
-                            <TableHead key={col.id || col.accessorKey as string} className="h-8 px-2">
+                          {columns.filter(col => col.id !== 'companyId' && ('accessorKey' in col ? col.accessorKey !== 'companyId' : true) && col.id !== 'select').map((col) => (
+                            <TableHead key={col.id || ('accessorKey' in col ? col.accessorKey as string : Math.random().toString())} className="h-8 px-2">
                               {typeof col.header === 'string' ? col.header : 'Header'}
                             </TableHead>
                           ))}
@@ -411,9 +411,9 @@ export function CustomersDataTable({
                           
                           return (
                             <TableRow key={customer._id} className="h-12 hover:bg-muted/50">
-                              {columns.filter(col => col.id !== 'companyId' && col.accessorKey !== 'companyId' && col.id !== 'select').map((col) => (
-                                <TableCell key={col.id || col.accessorKey as string} className="px-2 py-2">
-                                  {col.cell ? col.cell({ row: mockRow } as any) : (customer as any)[col.accessorKey as string]}
+                              {columns.filter(col => col.id !== 'companyId' && ('accessorKey' in col ? col.accessorKey !== 'companyId' : true) && col.id !== 'select').map((col) => (
+                                <TableCell key={col.id || ('accessorKey' in col ? col.accessorKey as string : Math.random().toString())} className="px-2 py-2">
+                                  {col.cell && typeof col.cell === 'function' ? col.cell({ row: mockRow } as any) : ('accessorKey' in col ? (customer as any)[col.accessorKey as string] : '')}
                                 </TableCell>
                               ))}
                             </TableRow>

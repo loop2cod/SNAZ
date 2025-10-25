@@ -44,8 +44,8 @@ const CompanySchema: Schema = new Schema({
   timestamps: true
 });
 
+// Note: name index is automatically created via unique: true
 // Index for efficient queries
-CompanySchema.index({ name: 1 });
 CompanySchema.index({ isActive: 1 });
 
 export default mongoose.model<ICompany>('Company', CompanySchema);

@@ -358,8 +358,8 @@ export default function CustomerDetailPage() {
         driverId: normalizedDriverId as string,
         packages: normalizedPackages,
         dailyFood: {
-          lunch: customer.dailyFood?.lunch,
-          dinner: customer.dailyFood?.dinner,
+          lunch: customer.dailyFood?.lunch || "",
+          dinner: customer.dailyFood?.dinner || "",
         },
         startDate: customer.startDate,
         endDate: customer.endDate,

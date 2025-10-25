@@ -112,7 +112,7 @@ export default function CustomersManagement() {
         categoryId: typeof pkg.categoryId === 'string' ? pkg.categoryId : pkg.categoryId._id,
         unitPrice: pkg.unitPrice
       })),
-      dailyFood: customer.dailyFood,
+      dailyFood: customer.dailyFood || { lunch: "", dinner: "" },
       startDate: customer.startDate.split('T')[0],
       endDate: customer.endDate ? customer.endDate.split('T')[0] : ""
     });
@@ -433,8 +433,8 @@ export default function CustomersManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <div>L: {customer.dailyFood.lunch}</div>
-                        <div>D: {customer.dailyFood.dinner}</div>
+                        <div>L: {customer.dailyFood?.lunch || ""}</div>
+                        <div>D: {customer.dailyFood?.dinner || ""}</div>
                       </div>
                     </TableCell>
                     <TableCell>

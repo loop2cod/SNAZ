@@ -83,7 +83,7 @@ export function QuickLunchOrderForm({
       // Parse lunch bag format and create orders for each package
       items: customer.packages.map(pkg => ({
         categoryId: typeof pkg.categoryId === 'string' ? pkg.categoryId : pkg.categoryId._id,
-        quantity: parseBagQuantity(customer.dailyFood.lunch),
+        quantity: parseBagQuantity(customer.dailyFood?.lunch || ""),
         unitPrice: pkg.unitPrice
       }))
     })).flat();
