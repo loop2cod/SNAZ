@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
+
+export const runtime = 'edge';
 import { useParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

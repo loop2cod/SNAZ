@@ -55,7 +55,7 @@ export default function QuickCustomerForm({
       return { ...prev, packages: [first] };
     });
   // run once on mount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
 
   useEffect(() => {
