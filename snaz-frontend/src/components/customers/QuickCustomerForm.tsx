@@ -40,7 +40,6 @@ export default function QuickCustomerForm({
     phone: initialData?.phone || "",
     driverId: initialData?.driverId || "",
     packages: initialData?.packages || [{ categoryId: "", unitPrice: 0 }],
-    dailyFood: initialData?.dailyFood || { lunch: "", dinner: "" },
     startDate: initialData?.startDate || "",
     endDate: initialData?.endDate || ""
   });
@@ -265,47 +264,6 @@ export default function QuickCustomerForm({
                 </div>
               </div>
 
-              {/* Daily Food Requirements Section */}
-              <div className="">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="bg-white rounded-lg p-4">
-                    <Label className="text-xs font-medium text-slate-700 mb-1.5 block">
-                      Lunch (Bag Format) *
-                    </Label>
-                    <Input
-                      value={formData.dailyFood.lunch}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        dailyFood: { ...formData.dailyFood, lunch: e.target.value }
-                      })}
-                      required
-                      className="h-8 font-mono border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-100"
-                      placeholder="e.g., 5,5+7"
-                    />
-                    <p className="text-[11px] text-slate-500 mt-2 bg-blue-50 p-2 rounded">
-                      <strong>Format:</strong> Non-veg counts + veg count (e.g., 5,5+7 = 10 non-veg + 7 veg)
-                    </p>
-                  </div>
-                  <div className="bg-white rounded-lg p-4">
-                    <Label className="text-xs font-medium text-slate-700 mb-1.5 block">
-                      Dinner (Bag Format) *
-                    </Label>
-                    <Input
-                      value={formData.dailyFood.dinner}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        dailyFood: { ...formData.dailyFood, dinner: e.target.value }
-                      })}
-                      required
-                      className="h-8 font-mono border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-100"
-                      placeholder="e.g., 3+5"
-                    />
-                    <p className="text-[11px] text-slate-500 mt-2 bg-blue-50 p-2 rounded">
-                      <strong>Format:</strong> Non-veg counts + veg count (e.g., 3+5 = 3 non-veg + 5 veg)
-                    </p>
-                  </div>
-                </div>
-              </div>
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row justify-center gap-2 pt-4">

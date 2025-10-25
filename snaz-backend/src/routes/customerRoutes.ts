@@ -14,10 +14,8 @@ const validateCustomer = [
   body('packages').isArray({ min: 1 }).withMessage('At least one package is required'),
   body('packages.*.categoryId').isMongoId().withMessage('Valid category ID is required'),
   body('packages.*.unitPrice').isFloat({ min: 0 }).withMessage('Unit price must be a positive number'),
-  body('dailyFood.lunch').trim().isLength({ min: 1 }).withMessage('Daily lunch is required'),
-  body('dailyFood.dinner').trim().isLength({ min: 1 }).withMessage('Daily dinner is required'),
   body('startDate').isISO8601().withMessage('Valid start date is required'),
-  body('endDate').optional().isISO8601().withMessage('Valid end date is required')
+  body('endDate').optional({ values: 'falsy' }).isISO8601().withMessage('Valid end date is required')
 ];
 
 // Routes

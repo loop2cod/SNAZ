@@ -39,7 +39,6 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Customer, Driver, FoodCategory } from "@/lib/api"
-import { parseBagFormat } from "@/lib/bagFormatParser"
 import { useRouter } from "next/navigation"
 
 interface CustomersDataTableProps {
@@ -168,57 +167,6 @@ export function CustomersDataTable({
       ),
     },
     {
-      accessorKey: "dailyFood",
-      header: "Daily Food",
-      cell: ({ row }) => {
-        const lunchParsed = parseBagFormat(row.original.dailyFood.lunch);
-        const dinnerParsed = parseBagFormat(row.original.dailyFood.dinner);
-        
-        return (
-          <div className="text-xs space-y-1 min-w-[120px]">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-1">
-                <span className="text-orange-600 font-medium">L:</span>
-                <span className="font-mono text-xs">{row.original.dailyFood.lunch}</span>
-              </div>
-              <div className="text-[10px] text-muted-foreground ml-3">
-                {lunchParsed.nonVegCount} Non-veg, {lunchParsed.vegCount} Veg
-              </div>
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-1">
-                <span className="text-purple-600 font-medium">D:</span>
-                <span className="font-mono text-xs">{row.original.dailyFood.dinner}</span>
-              </div>
-              <div className="text-[10px] text-muted-foreground ml-3">
-                {dinnerParsed.nonVegCount} Non-veg, {dinnerParsed.vegCount} Veg
-              </div>
-            </div>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "dailyTotals",
-      header: "Daily Totals",
-      cell: ({ row }) => {
-        const lunchParsed = parseBagFormat(row.original.dailyFood.lunch);
-        const dinnerParsed = parseBagFormat(row.original.dailyFood.dinner);
-        const totalNonVeg = lunchParsed.nonVegCount + dinnerParsed.nonVegCount;
-        const totalVeg = lunchParsed.vegCount + dinnerParsed.vegCount;
-        const grandTotal = totalNonVeg + totalVeg;
-        
-        return (
-          <div className="text-xs text-center">
-            <div className="font-medium text-gray-900">{grandTotal}</div>
-            <div className="text-[10px] text-muted-foreground">
-              <span className="text-red-600">{totalNonVeg}NV</span> • <span className="text-green-600">{totalVeg}V</span>
-            </div>
-          </div>
-        );
-      },
-    },
-    {
       accessorKey: "isActive",
       header: "Status",
       cell: ({ row }) => (
@@ -310,7 +258,6 @@ export function CustomersDataTable({
     address: "hidden xl:table-cell",
     driverId: "hidden sm:table-cell",
     packages: "hidden md:table-cell",
-    dailyFood: "hidden lg:table-cell",
     isActive: "hidden md:table-cell",
     startDate: "hidden md:table-cell",
   };

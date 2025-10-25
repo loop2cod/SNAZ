@@ -57,7 +57,7 @@ export const createCustomer = async (req: Request, res: Response) => {
 
     const { name, address, phone, email, companyId, driverId, packages, dailyFood, startDate, endDate } = req.body;
     
-    const customer = new Customer({
+    const customerData: any = {
       name,
       address,
       phone,
@@ -65,10 +65,15 @@ export const createCustomer = async (req: Request, res: Response) => {
       companyId,
       driverId,
       packages,
-      dailyFood,
       startDate,
       endDate
-    });
+    };
+    
+    if (dailyFood) {
+      customerData.dailyFood = dailyFood;
+    }
+    
+    const customer = new Customer(customerData);
 
     const savedCustomer = await customer.save();
     await savedCustomer.populate('driverId', 'name route');
@@ -90,9 +95,26 @@ export const updateCustomer = async (req: Request, res: Response) => {
 
     const { name, address, phone, email, companyId, driverId, packages, dailyFood, startDate, endDate, isActive } = req.body;
     
+    const updateData: any = {
+      name,
+      address,
+      phone,
+      email,
+      companyId,
+      driverId,
+      packages,
+      startDate,
+      endDate,
+      isActive
+    };
+    
+    if (dailyFood) {
+      updateData.dailyFood = dailyFood;
+    }
+    
     const customer = await Customer.findByIdAndUpdate(
       req.params.id,
-      { name, address, phone, email, companyId, driverId, packages, dailyFood, startDate, endDate, isActive },
+      updateData,
       { new: true, runValidators: true }
     ).populate('driverId', 'name route')
      .populate('packages.categoryId', 'name');

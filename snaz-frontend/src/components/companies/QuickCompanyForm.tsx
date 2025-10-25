@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState} from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,7 +33,7 @@ export default function QuickCompanyForm({
   });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name.trim() || !formData.address.trim()) {
@@ -61,26 +61,44 @@ export default function QuickCompanyForm({
     }
   };
 
+
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData((prevData) => ({ ...prevData, [field]: value }));
   };
 
-  const FormContent = () => (
-    <form onSubmit={handleSubmit} className="space-y-4">
+
+  return <Card className="border-2 border-blue-200 bg-blue-50/30">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-blue-600" />
+                {isEditing ? "Edit Company" : "New Company"}
+              </CardTitle>
+              <CardDescription>
+                {isEditing ? "Update company information" : "Create a new company entry"}
+              </CardDescription>
+            </div>
+            <Button variant="ghost" size="sm" onClick={onCancel} disabled={loading}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="name">Company Name *</Label>
           <Input
             id="name"
+            name="company-name"
             value={formData.name}
             onChange={(e) => handleChange('name', e.target.value)}
             placeholder="Enter company name"
             required
             disabled={loading}
             className="h-9"
+            autoComplete="organization"
           />
         </div>
         
@@ -88,11 +106,13 @@ export default function QuickCompanyForm({
           <Label htmlFor="contactPerson">Contact Person</Label>
           <Input
             id="contactPerson"
+            name="contact-person"
             value={formData.contactPerson}
             onChange={(e) => handleChange('contactPerson', e.target.value)}
             placeholder="Enter contact person"
             disabled={loading}
             className="h-9"
+            autoComplete="name"
           />
         </div>
       </div>
@@ -101,6 +121,7 @@ export default function QuickCompanyForm({
         <Label htmlFor="address">Address *</Label>
         <Textarea
           id="address"
+          name="address"
           value={formData.address}
           onChange={(e) => handleChange('address', e.target.value)}
           placeholder="Enter company address"
@@ -108,6 +129,7 @@ export default function QuickCompanyForm({
           required
           disabled={loading}
           className="resize-none"
+          autoComplete="street-address"
         />
       </div>
 
@@ -116,12 +138,14 @@ export default function QuickCompanyForm({
           <Label htmlFor="phone">Phone</Label>
           <Input
             id="phone"
+            name="phone"
             type="tel"
             value={formData.phone}
             onChange={(e) => handleChange('phone', e.target.value)}
             placeholder="Enter phone number"
             disabled={loading}
             className="h-9"
+            autoComplete="tel"
           />
         </div>
         
@@ -129,12 +153,14 @@ export default function QuickCompanyForm({
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
+            name="email"
             type="email"
             value={formData.email}
             onChange={(e) => handleChange('email', e.target.value)}
             placeholder="Enter email address"
             disabled={loading}
             className="h-9"
+            autoComplete="email"
           />
         </div>
       </div>
@@ -153,33 +179,6 @@ export default function QuickCompanyForm({
         </Button>
       </div>
     </form>
-  );
-
-  if (embedded) {
-    return (
-      <Card className="border-2 border-blue-200 bg-blue-50/30">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-blue-600" />
-                {isEditing ? "Edit Company" : "New Company"}
-              </CardTitle>
-              <CardDescription>
-                {isEditing ? "Update company information" : "Create a new company entry"}
-              </CardDescription>
-            </div>
-            <Button variant="ghost" size="sm" onClick={onCancel} disabled={loading}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <FormContent />
         </CardContent>
-      </Card>
-    );
-  }
-
-  return <FormContent />;
+      </Card>;
 }

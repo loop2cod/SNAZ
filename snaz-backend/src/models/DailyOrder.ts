@@ -45,8 +45,9 @@ const OrderItemSchema: Schema = new Schema({
   },
   bagFormat: {
     type: String,
-    required: true,
-    trim: true
+    required: false,
+    trim: true,
+    default: ''
   },
   nonVegCount: {
     type: Number,

@@ -52,7 +52,9 @@ export default function CompaniesPage() {
       setShowAddForm(false);
       setEditingCompany(null);
     } catch (error: any) {
-      toast.error(editingCompany ? "Failed to update company" : "Failed to create company");
+      console.error('Company operation error:', error);
+      const errorMessage = error.response?.data?.message || error.message || (editingCompany ? "Failed to update company" : "Failed to create company");
+      toast.error(errorMessage);
     }
   };
 
@@ -93,7 +95,7 @@ export default function CompaniesPage() {
   };
 
   return (
-    <ProtectedRoute requiredRoles={['admin', 'manager']}>
+    <ProtectedRoute>
       <MainLayout>
       <div className="space-y-6">
         {/* Header */}

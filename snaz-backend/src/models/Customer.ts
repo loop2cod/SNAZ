@@ -18,7 +18,7 @@ export interface ICustomer extends Document {
   companyId?: mongoose.Types.ObjectId;
   driverId: mongoose.Types.ObjectId;
   packages: ICustomerPackage[];
-  dailyFood: IDailyFood;
+  dailyFood?: IDailyFood;
   startDate: Date;
   endDate?: Date;
   isActive: boolean;
@@ -83,7 +83,7 @@ const CustomerSchema: Schema = new Schema({
   packages: [CustomerPackageSchema],
   dailyFood: {
     type: DailyFoodSchema,
-    required: true
+    required: false
   },
   startDate: {
     type: Date,

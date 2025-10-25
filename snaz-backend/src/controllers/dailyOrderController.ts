@@ -110,7 +110,7 @@ export const generateDailyOrders = async (req: Request, res: Response) => {
       for (const customer of driverData.customers) {
         // Process lunch and dinner
         for (const mealType of ['lunch', 'dinner']) {
-          const bagFormat = customer.dailyFood[mealType];
+          const bagFormat = customer.dailyFood?.[mealType] || '';
           const parsed = parseBagFormat(bagFormat);
 
           // Create order items for each package category
