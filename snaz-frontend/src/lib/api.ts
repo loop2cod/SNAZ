@@ -46,10 +46,11 @@ export interface Customer {
   companyId?: string | Company;
   driverId: string | Driver;
   packages: CustomerPackage[];
-  dailyFood: {
+  dailyFood?: {
     lunch: string;
     dinner: string;
   };
+  billingType: 'individual' | 'company';
   startDate: string;
   endDate?: string;
   isActive: boolean;
@@ -469,6 +470,54 @@ class ApiClient {
     });
     return response.data;
   }
+
+  // Dual Billing API Methods
+  async recordPaymentDualBilling(paymentData: {
+    entityType: 'customer' | 'company';
+    entityId: string;
+    amount: number;
+    date: string;
+    method?: string;
+    reference?: string;
+    notes?: string;
+    billId?: string;
+    processedBy?: string;
+  }) {
+    const response = await this.request('/payments/dual-billing', {
+      method: 'POST',
+      body: JSON.stringify(paymentData),
+    });
+    return response.data;
+  }
+
+  async getPaymentAuditTrail(params?: {
+    entityType?: 'customer' | 'company';
+    entityId?: string;
+    paymentId?: string;
+  }) {
+    const queryParams = new URLSearchParams();
+    if (params?.entityType) queryParams.set('entityType', params.entityType);
+    if (params?.entityId) queryParams.set('entityId', params.entityId);
+    if (params?.paymentId) queryParams.set('paymentId', params.paymentId);
+    
+    const response = await this.request(`/payments/audit-trail?${queryParams}`);
+    return response.data;
+  }
+
+  async getBillsWithDualBilling(params?: {
+    entityType?: 'customer' | 'company';
+    entityId?: string;
+    includeLinked?: boolean;
+  }) {
+    const queryParams = new URLSearchParams();
+    if (params?.entityType) queryParams.set('entityType', params.entityType);
+    if (params?.entityId) queryParams.set('entityId', params.entityId);
+    if (params?.includeLinked) queryParams.set('includeLinked', 'true');
+    
+    const response = await this.request(`/payments/bills/dual-billing?${queryParams}`);
+    return response.data;
+  }
+
 }
 
 export const apiClient = new ApiClient();

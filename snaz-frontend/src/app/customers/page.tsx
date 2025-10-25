@@ -55,6 +55,8 @@ export default function CustomersPage() {
 
   const handleQuickFormSubmit = async (submittedFormData: any) => {
     try {
+      console.log("Submitted form data:", submittedFormData);
+      
       const validPackages = submittedFormData.packages.filter((pkg: any) => pkg.categoryId && pkg.unitPrice > 0);
       if (validPackages.length === 0) {
         toast.error("At least one package with valid category and price is required");
@@ -63,8 +65,12 @@ export default function CustomersPage() {
 
       const customerData = {
         ...submittedFormData,
-        packages: validPackages
+        packages: validPackages,
+        // Ensure companyId is properly handled
+        companyId: submittedFormData.companyId || undefined
       };
+      
+      console.log("Final customer data:", customerData);
 
       if (editingCustomer) {
         const updatedCustomer = await apiClient.updateCustomer(editingCustomer._id, customerData);
@@ -78,6 +84,7 @@ export default function CustomersPage() {
       setShowAddForm(false);
       setEditingCustomer(null);
     } catch (error) {
+      console.error("Error in handleQuickFormSubmit:", error);
       toast.error(editingCustomer ? "Failed to update customer" : "Failed to create customer");
     }
   };

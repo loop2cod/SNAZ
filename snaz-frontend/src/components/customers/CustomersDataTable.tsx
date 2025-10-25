@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Edit, Trash2, Package, Truck, Search, Download, Eye } from "lucide-react"
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Edit, Trash2, Package, Truck, Search, Download, Eye, Building2, Group } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -65,6 +65,7 @@ export function CustomersDataTable({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [groupByCompany, setGroupByCompany] = React.useState(false)
 
   const getDriverName = (driverId: string | Driver) => {
     if (typeof driverId === 'object') return driverId.name;
@@ -77,6 +78,30 @@ export function CustomersDataTable({
     const category = foodCategories.find(c => c._id === categoryId);
     return category?.name || "Unknown";
   }
+
+  const getCompanyName = (companyId: string | any) => {
+    if (typeof companyId === 'object' && companyId?.name) return companyId.name;
+    return null;
+  }
+
+  // Group customers by company
+  const groupedCustomers = React.useMemo(() => {
+    if (!groupByCompany) return { ungrouped: customers };
+    
+    const groups: Record<string, Customer[]> = {};
+    
+    customers.forEach(customer => {
+      const companyName = getCompanyName(customer.companyId);
+      const groupKey = companyName || 'Individual Customers';
+      
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(customer);
+    });
+    
+    return groups;
+  }, [customers, groupByCompany]);
 
   const formatPackages = (packages: any[]) => {
     return packages.map(pkg => `${getCategoryName(pkg.categoryId)}: $${pkg.unitPrice}`).join(", ");
@@ -144,6 +169,25 @@ export function CustomersDataTable({
           <span className="text-sm">{getDriverName(row.getValue("driverId"))}</span>
         </div>
       ),
+    },
+    {
+      accessorKey: "companyId",
+      header: "Company",
+      cell: ({ row }) => {
+        const companyName = getCompanyName(row.original.companyId);
+        return (
+          <div className="flex items-center gap-1">
+            {companyName ? (
+              <>
+                <Building2 className="h-3 w-3 text-muted-foreground" />
+                <span className="text-sm">{companyName}</span>
+              </>
+            ) : (
+              <span className="text-xs text-muted-foreground italic">Individual</span>
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "packages",
@@ -257,6 +301,7 @@ export function CustomersDataTable({
     select: "hidden sm:table-cell",
     address: "hidden xl:table-cell",
     driverId: "hidden sm:table-cell",
+    companyId: "hidden lg:table-cell",
     packages: "hidden md:table-cell",
     isActive: "hidden md:table-cell",
     startDate: "hidden md:table-cell",
@@ -271,6 +316,14 @@ export function CustomersDataTable({
             <CardDescription>Manage customer information and packages</CardDescription>
           </div>
           <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => setGroupByCompany(!groupByCompany)}
+              variant={groupByCompany ? "default" : "outline"} 
+              size="sm"
+            >
+              <Group className="h-3 w-3 mr-2" />
+              {groupByCompany ? "Ungrouped" : "Group by Company"}
+            </Button>
             <Button onClick={onExport} variant="outline" size="sm">
               <Download className="h-3 w-3 mr-2" />
               Export
@@ -322,57 +375,110 @@ export function CustomersDataTable({
           </div>
 
           {/* Data Table */}
-          <div className="rounded-md border">
-            <Table className="min-w-[900px] md:min-w-0">
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="bg-muted/50">
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id} className={cn("h-8 px-2", responsiveColClasses[header.column.id as string])}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                      className="h-12 hover:bg-muted/50"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className={cn("px-2 py-2", responsiveColClasses[cell.column.id as string])}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
+          {groupByCompany ? (
+            /* Grouped View */
+            <div className="space-y-6">
+              {Object.entries(groupedCustomers).map(([groupName, groupCustomers]) => (
+                <div key={groupName} className="space-y-2">
+                  <div className="flex items-center gap-2 py-2 px-4 bg-muted/30 rounded-md">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <h3 className="font-semibold text-sm">{groupName}</h3>
+                    <Badge variant="secondary" className="text-xs">
+                      {groupCustomers.length} customer{groupCustomers.length !== 1 ? 's' : ''}
+                    </Badge>
+                  </div>
+                  <div className="rounded-md border">
+                    <Table className="min-w-[900px] md:min-w-0">
+                      <TableHeader>
+                        <TableRow className="bg-muted/50">
+                          {columns.filter(col => col.id !== 'companyId' && col.accessorKey !== 'companyId' && col.id !== 'select').map((col) => (
+                            <TableHead key={col.id || col.accessorKey as string} className="h-8 px-2">
+                              {typeof col.header === 'string' ? col.header : 'Header'}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {groupCustomers.map((customer) => {
+                          // Create a mock row object for the grouped view
+                          const mockRow = {
+                            original: customer,
+                            getValue: (key: string) => (customer as any)[key],
+                            getIsSelected: () => false,
+                            toggleSelected: () => {},
+                            id: customer._id
+                          };
+                          
+                          return (
+                            <TableRow key={customer._id} className="h-12 hover:bg-muted/50">
+                              {columns.filter(col => col.id !== 'companyId' && col.accessorKey !== 'companyId' && col.id !== 'select').map((col) => (
+                                <TableCell key={col.id || col.accessorKey as string} className="px-2 py-2">
+                                  {col.cell ? col.cell({ row: mockRow } as any) : (customer as any)[col.accessorKey as string]}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* Regular Table View */
+            <div className="rounded-md border">
+              <Table className="min-w-[900px] md:min-w-0">
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id} className="bg-muted/50">
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableHead key={header.id} className={cn("h-8 px-2", responsiveColClasses[header.column.id as string])}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                          </TableHead>
+                        )
+                      })}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No customers found.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                        className="h-12 hover:bg-muted/50"
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id} className={cn("px-2 py-2", responsiveColClasses[cell.column.id as string])}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No customers found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
 
           {/* Pagination */}
           <div className="flex items-center justify-between space-x-2 py-2">

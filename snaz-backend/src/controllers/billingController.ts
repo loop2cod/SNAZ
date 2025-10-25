@@ -24,10 +24,12 @@ export async function generateMonthlyBills(req: Request, res: Response) {
     }
     const { startDate, endDate } = monthDateRange(year, month);
 
-    const activeCustomers = await Customer.find({ isActive: true }).populate('driverId', 'name').populate('packages.categoryId', 'name');
+    const activeCustomers = await Customer.find({ isActive: true }).populate('driverId', 'name').populate('packages.categoryId', 'name').populate('companyId', 'name');
 
     const createdBills: any[] = [];
+    const companyCustomerBills: { [companyId: string]: any[] } = {};
 
+    // Step 1: Generate individual customer bills (always)
     for (const cust of activeCustomers) {
       // If bill exists for this period, update it; otherwise create new
       const exists = await Bill.findOne({ entityType: 'customer', entityId: cust._id, periodYear: year, periodMonth: month });
@@ -46,6 +48,10 @@ export async function generateMonthlyBills(req: Request, res: Response) {
       const tax = 0; // apply GST later if needed
       const total = round2(subtotal + tax);
 
+      // Determine billing management
+      const managedBy = (cust as any).companyId ? 'company' : 'self';
+      const billingType = (cust as any).companyId ? 'company' : 'individual';
+
       let bill: any;
       if (exists) {
         exists.items = items as any;
@@ -54,6 +60,7 @@ export async function generateMonthlyBills(req: Request, res: Response) {
         exists.totalAmount = total;
         exists.startDate = startDate;
         exists.endDate = endDate;
+        exists.managedBy = managedBy;
         exists.balanceAmount = round2(Math.max(0, total - (exists.paidAmount || 0)));
         exists.status = exists.balanceAmount === 0 ? 'paid' : ((exists.paidAmount || 0) > 0 ? 'partial' : 'unpaid');
         bill = await exists.save();
@@ -74,37 +81,70 @@ export async function generateMonthlyBills(req: Request, res: Response) {
           paidAmount: 0,
           balanceAmount: total,
           status: 'unpaid',
+          managedBy,
           generatedAt: new Date(),
         });
         await bill.save();
       }
 
-      // Auto-apply any advance payments for this customer
-      await applyAdvancePayments('customer', cust._id as Types.ObjectId, bill);
+      // Group company customer bills for later aggregation
+      if ((cust as any).companyId) {
+        const companyId = (cust as any).companyId._id.toString();
+        if (!companyCustomerBills[companyId]) {
+          companyCustomerBills[companyId] = [];
+        }
+        companyCustomerBills[companyId].push(bill);
+      } else {
+        // Auto-apply any advance payments for individual customers only
+        await applyAdvancePayments('customer', cust._id as Types.ObjectId, bill);
+      }
+
       createdBills.push(bill);
     }
 
-    // Generate company aggregated bills (sum of their customers' bills for the same period)
+    // Step 2: Generate company aggregated bills (sum of their customers' bills for the same period)
     const activeCompanies = await Company.find({ isActive: true });
     for (const comp of activeCompanies) {
-      const exists = await Bill.findOne({ entityType: 'company', entityId: comp._id, periodYear: year, periodMonth: month });
+      const companyId = (comp._id as Types.ObjectId).toString();
+      const customerBills = companyCustomerBills[companyId] || [];
+      
+      if (customerBills.length === 0) continue;
 
-      const custBills = await Bill.find({ entityType: 'customer', periodYear: year, periodMonth: month }).populate({ path: 'entityId', model: 'Customer', match: { companyId: comp._id } });
-      const filtered = custBills.filter(b => (b as any).entityId); // only those belonging to this company
-      if (filtered.length === 0) continue;
+      const exists = await Bill.findOne({ entityType: 'company', entityId: comp._id as Types.ObjectId, periodYear: year, periodMonth: month });
 
-      const subtotal = round2(filtered.reduce((s, b) => s + b.subtotal, 0));
+      const subtotal = round2(customerBills.reduce((s, b) => s + b.subtotal, 0));
       const tax = 0;
       const total = round2(subtotal + tax);
 
+      // Create consolidated bill items from customer bills
+      const consolidatedItems: any[] = [];
+      customerBills.forEach(custBill => {
+        custBill.items.forEach((item: any) => {
+          const existing = consolidatedItems.find(ci => ci.categoryId.toString() === item.categoryId.toString());
+          if (existing) {
+            existing.quantity += item.quantity;
+            existing.amount += item.amount;
+          } else {
+            consolidatedItems.push({
+              categoryId: item.categoryId,
+              categoryName: item.categoryName,
+              unitPrice: item.unitPrice,
+              quantity: item.quantity,
+              amount: item.amount,
+            });
+          }
+        });
+      });
+
       let bill: any;
       if (exists) {
-        exists.items = [] as any;
+        exists.items = consolidatedItems as any;
         exists.subtotal = subtotal;
         exists.tax = tax;
         exists.totalAmount = total;
         exists.startDate = startDate;
         exists.endDate = endDate;
+        exists.isConsolidated = true;
         exists.balanceAmount = round2(Math.max(0, total - (exists.paidAmount || 0)));
         exists.status = exists.balanceAmount === 0 ? 'paid' : ((exists.paidAmount || 0) > 0 ? 'partial' : 'unpaid');
         bill = await exists.save();
@@ -113,22 +153,30 @@ export async function generateMonthlyBills(req: Request, res: Response) {
         bill = new Bill({
           number,
           entityType: 'company',
-          entityId: comp._id,
+          entityId: comp._id as Types.ObjectId,
           periodYear: year,
           periodMonth: month,
           startDate,
           endDate,
-          items: [], // summary bill; details available in customer bills
+          items: consolidatedItems,
           subtotal,
           tax,
           totalAmount: total,
           paidAmount: 0,
           balanceAmount: total,
           status: 'unpaid',
+          isConsolidated: true,
           generatedAt: new Date(),
         });
         await bill.save();
       }
+
+      // Link customer bills to company bill
+      for (const custBill of customerBills) {
+        custBill.parentBillId = bill._id;
+        await custBill.save();
+      }
+
       // Auto-apply any advance payments for this company
       await applyAdvancePayments('company', comp._id as Types.ObjectId, bill);
       createdBills.push(bill);

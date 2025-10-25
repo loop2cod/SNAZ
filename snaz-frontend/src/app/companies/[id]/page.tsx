@@ -376,6 +376,8 @@ export default function CompanyDetailPage() {
               embedded
               drivers={drivers}
               foodCategories={foodCategories}
+              companies={[company]}
+              autoAssignCompanyId={companyId}
               onSubmit={handleQuickFormSubmit}
               onCancel={() => setShowAddForm(false)}
               initialData={editingCustomer ? formData : undefined}

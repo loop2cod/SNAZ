@@ -21,6 +21,7 @@ export interface ICustomer extends Document {
   dailyFood?: IDailyFood;
   startDate: Date;
   endDate?: Date;
+  billingType: 'individual' | 'company';
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -91,6 +92,12 @@ const CustomerSchema: Schema = new Schema({
   },
   endDate: {
     type: Date
+  },
+  billingType: {
+    type: String,
+    enum: ['individual', 'company'],
+    default: 'individual',
+    index: true
   },
   isActive: {
     type: Boolean,

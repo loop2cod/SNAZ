@@ -18,6 +18,8 @@ import { Driver, FoodCategory } from "@/lib/api";
 interface QuickCustomerFormProps {
   drivers: Driver[];
   foodCategories: FoodCategory[];
+  companies?: any[];  // Optional companies prop
+  autoAssignCompanyId?: string;  // Auto-assign customer to this company
   onSubmit: (formData: any) => Promise<void>;
   onCancel: () => void;
   initialData?: any;
@@ -28,6 +30,8 @@ interface QuickCustomerFormProps {
 export default function QuickCustomerForm({
   drivers,
   foodCategories,
+  companies = [],
+  autoAssignCompanyId,
   onSubmit,
   onCancel,
   initialData,
@@ -39,6 +43,7 @@ export default function QuickCustomerForm({
     address: initialData?.address || "",
     phone: initialData?.phone || "",
     driverId: initialData?.driverId || "",
+    companyId: initialData?.companyId || autoAssignCompanyId || "",
     packages: initialData?.packages || [{ categoryId: "", unitPrice: 0 }],
     startDate: initialData?.startDate || "",
     endDate: initialData?.endDate || ""
@@ -68,7 +73,13 @@ export default function QuickCustomerForm({
     e.preventDefault();
     setLoading(true);
     try {
-      await onSubmit(formData);
+      // Automatically set billingType based on company selection or auto-assignment
+      const submissionData = {
+        ...formData,
+        companyId: formData.companyId || autoAssignCompanyId || undefined,
+        billingType: (formData.companyId || autoAssignCompanyId) ? 'company' : 'individual'
+      };
+      await onSubmit(submissionData);
     } finally {
       setLoading(false);
     }
@@ -169,6 +180,42 @@ export default function QuickCustomerForm({
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Company - Only show if companies are provided and no auto-assignment */}
+                  {companies.length > 0 && !autoAssignCompanyId && (
+                    <div>
+                      <Label className="text-xs font-medium text-slate-700 mb-1 block">
+                        Company (Optional)
+                      </Label>
+                      <Select
+                        value={formData.companyId}
+                        onValueChange={(value) => setFormData({ ...formData, companyId: value })}
+                      >
+                        <SelectTrigger className="h-8 border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-100 w-full">
+                          <SelectValue placeholder="Select company (individual if none)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {companies.map(company => (
+                            <SelectItem key={company._id} value={company._id}>
+                              {company.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Show company info if auto-assigned */}
+                  {autoAssignCompanyId && (
+                    <div>
+                      <Label className="text-xs font-medium text-slate-700 mb-1 block">
+                        Company
+                      </Label>
+                      <div className="h-8 px-3 border border-slate-300 rounded-md bg-slate-50 flex items-center text-sm text-slate-600">
+                        {companies.find(c => c._id === autoAssignCompanyId)?.name || 'Selected Company'}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Phone */}
                   <div>

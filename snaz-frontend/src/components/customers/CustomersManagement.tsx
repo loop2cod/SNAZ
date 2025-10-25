@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Edit, Trash2, Search, Package, Truck } from "lucide-react";
-import { apiClient, Customer, Driver, FoodCategory } from "@/lib/api";
+import { apiClient, Customer, Driver, FoodCategory, Company } from "@/lib/api";
 import { toast } from "sonner";
 
 export default function CustomersManagement() {
@@ -17,6 +17,7 @@ export default function CustomersManagement() {
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [foodCategories, setFoodCategories] = useState<FoodCategory[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -51,15 +52,17 @@ export default function CustomersManagement() {
 
   const loadData = async () => {
     try {
-      const [customersData, driversData, categoriesData] = await Promise.all([
+      const [customersData, driversData, categoriesData, companiesData] = await Promise.all([
         apiClient.getCustomers(),
         apiClient.getDrivers(),
-        apiClient.getFoodCategories()
+        apiClient.getFoodCategories(),
+        apiClient.getCompanies()
       ]);
       setCustomers(customersData);
       setFilteredCustomers(customersData);
       setDrivers(driversData);
       setFoodCategories(categoriesData);
+      setCompanies(companiesData);
     } catch (error) {
       toast.error("Failed to load data");
     } finally {

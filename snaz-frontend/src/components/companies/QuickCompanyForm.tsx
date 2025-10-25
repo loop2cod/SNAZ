@@ -97,7 +97,7 @@ export default function QuickCompanyForm({
             placeholder="Enter company name"
             required
             disabled={loading}
-            className="h-9"
+            className="h-9 bg-white"
             autoComplete="organization"
           />
         </div>
@@ -111,7 +111,7 @@ export default function QuickCompanyForm({
             onChange={(e) => handleChange('contactPerson', e.target.value)}
             placeholder="Enter contact person"
             disabled={loading}
-            className="h-9"
+            className="h-9 bg-white"
             autoComplete="name"
           />
         </div>
@@ -144,7 +144,7 @@ export default function QuickCompanyForm({
             onChange={(e) => handleChange('phone', e.target.value)}
             placeholder="Enter phone number"
             disabled={loading}
-            className="h-9"
+            className="h-9 bg-white"
             autoComplete="tel"
           />
         </div>
@@ -159,7 +159,7 @@ export default function QuickCompanyForm({
             onChange={(e) => handleChange('email', e.target.value)}
             placeholder="Enter email address"
             disabled={loading}
-            className="h-9"
+            className="h-9 bg-white"
             autoComplete="email"
           />
         </div>

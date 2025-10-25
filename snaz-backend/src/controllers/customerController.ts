@@ -7,9 +7,9 @@ export const getAllCustomers = async (req: Request, res: Response) => {
   try {
     const customers = await Customer.find({ isActive: true })
       .populate('driverId', 'name route')
-      .populate('companyId', 'name')
+      .populate('companyId', 'name address')
       .populate('packages.categoryId', 'name')
-      .sort({ name: 1 });
+      .sort({ companyId: 1, name: 1 }); // Sort by company first, then name
     res.json({ success: true, data: customers });
   } catch (error) {
     console.error('Error fetching customers:', error);
@@ -55,16 +55,20 @@ export const createCustomer = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { name, address, phone, email, companyId, driverId, packages, dailyFood, startDate, endDate } = req.body;
+    const { name, address, phone, email, companyId, driverId, packages, dailyFood, billingType, startDate, endDate } = req.body;
+    
+    // Auto-determine billingType if not provided
+    const finalBillingType = billingType || (companyId ? 'company' : 'individual');
     
     const customerData: any = {
       name,
       address,
       phone,
       email,
-      companyId,
+      companyId: companyId || undefined,
       driverId,
       packages,
+      billingType: finalBillingType,
       startDate,
       endDate
     };
@@ -93,16 +97,20 @@ export const updateCustomer = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { name, address, phone, email, companyId, driverId, packages, dailyFood, startDate, endDate, isActive } = req.body;
+    const { name, address, phone, email, companyId, driverId, packages, dailyFood, billingType, startDate, endDate, isActive } = req.body;
+    
+    // Auto-determine billingType if not provided
+    const finalBillingType = billingType || (companyId ? 'company' : 'individual');
     
     const updateData: any = {
       name,
       address,
       phone,
       email,
-      companyId,
+      companyId: companyId || undefined,
       driverId,
       packages,
+      billingType: finalBillingType,
       startDate,
       endDate,
       isActive

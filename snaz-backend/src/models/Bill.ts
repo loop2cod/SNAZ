@@ -27,6 +27,9 @@ export interface IBill extends Document {
   status: 'unpaid' | 'partial' | 'paid' | 'cancelled';
   dueDate?: Date;
   generatedAt: Date;
+  managedBy?: 'self' | 'company';  // Who manages this bill
+  parentBillId?: mongoose.Types.ObjectId;  // Link to company bill if applicable
+  isConsolidated?: boolean;  // True for company aggregate bills
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,6 +59,9 @@ const BillSchema: Schema = new Schema({
   status: { type: String, enum: ['unpaid', 'partial', 'paid', 'cancelled'], default: 'unpaid' },
   dueDate: { type: Date },
   generatedAt: { type: Date, required: true, default: () => new Date() },
+  managedBy: { type: String, enum: ['self', 'company'], default: 'self' },
+  parentBillId: { type: Schema.Types.ObjectId, ref: 'Bill', index: true },
+  isConsolidated: { type: Boolean, default: false, index: true },
 }, { timestamps: true });
 
 BillSchema.index({ entityType: 1, entityId: 1, periodYear: 1, periodMonth: 1 }, { unique: true });

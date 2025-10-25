@@ -10,10 +10,12 @@ const validateCustomer = [
   body('address').trim().isLength({ min: 1, max: 300 }).withMessage('Address is required and should be 1-300 characters'),
   body('phone').optional().trim().isLength({ max: 15 }).withMessage('Phone should be max 15 characters'),
   body('email').optional().isEmail().withMessage('Valid email is required'),
+  body('companyId').optional().isMongoId().withMessage('Valid company ID is required'),
   body('driverId').isMongoId().withMessage('Valid driver ID is required'),
   body('packages').isArray({ min: 1 }).withMessage('At least one package is required'),
   body('packages.*.categoryId').isMongoId().withMessage('Valid category ID is required'),
   body('packages.*.unitPrice').isFloat({ min: 0 }).withMessage('Unit price must be a positive number'),
+  body('billingType').optional().isIn(['individual', 'company']).withMessage('Billing type must be individual or company'),
   body('startDate').isISO8601().withMessage('Valid start date is required'),
   body('endDate').optional({ values: 'falsy' }).isISO8601().withMessage('Valid end date is required')
 ];

@@ -15,8 +15,15 @@ const geistMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SNAZ Catering Management System",
-  description: "Complete catering order management and delivery system",
+  title: "Shafi Catering",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
 };
 
 export default function RootLayout({

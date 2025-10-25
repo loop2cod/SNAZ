@@ -4,7 +4,9 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Sun } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Sun, Truck, Group } from "lucide-react";
 
 interface LunchOrderData {
   customerId: string;
@@ -31,10 +33,29 @@ export function LunchOrdersTable({
   onOrderChange,
   onExport,
 }: LunchOrdersTableProps) {
+  const [groupByDriver, setGroupByDriver] = React.useState(true); // Default to grouped view
 
   const handleBagFormatChange = (customerId: string, value: string) => {
     onOrderChange(customerId, 'bagFormat', value);
   };
+
+  // Group data by driver
+  const groupedData = React.useMemo(() => {
+    if (!groupByDriver) return { ungrouped: data };
+    
+    const groups: Record<string, LunchOrderData[]> = {};
+    
+    data.forEach(order => {
+      const driverName = order.driverName || 'Unknown Driver';
+      
+      if (!groups[driverName]) {
+        groups[driverName] = [];
+      }
+      groups[driverName].push(order);
+    });
+    
+    return groups;
+  }, [data, groupByDriver]);
 
   if (loading) {
     return (
@@ -59,15 +80,25 @@ export function LunchOrdersTable({
               Excel-style interface for managing customer lunch orders
             </CardDescription>
           </div>
-          {onExport && (
-            <button
-              type="button"
-              className="text-sm px-3 py-1.5 border rounded-md hover:bg-slate-50"
-              onClick={onExport}
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => setGroupByDriver(!groupByDriver)}
+              variant={groupByDriver ? "default" : "outline"} 
+              size="sm"
             >
-              Export Excel
-            </button>
-          )}
+              <Group className="h-3 w-3 mr-2" />
+              {groupByDriver ? "Ungrouped" : "Group by Driver"}
+            </Button>
+            {onExport && (
+              <button
+                type="button"
+                className="text-sm px-3 py-1.5 border rounded-md hover:bg-slate-50"
+                onClick={onExport}
+              >
+                Export Excel
+              </button>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-0">
@@ -86,73 +117,176 @@ export function LunchOrdersTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                    No customers found for lunch orders
-                  </TableCell>
-                </TableRow>
+              {groupByDriver ? (
+                /* Grouped View by Driver */
+                Object.entries(groupedData).map(([driverName, driverOrders]) => (
+                  <React.Fragment key={driverName}>
+                    {/* Driver Header Row */}
+                    <TableRow className="bg-blue-50 hover:bg-blue-50 border-b-2 border-blue-200">
+                      <TableCell className="text-center font-bold text-blue-700 border-r">
+                        <Truck className="h-3 w-3 inline mr-1" />
+                      </TableCell>
+                      <TableCell className="font-bold text-sm text-blue-700 border-r" colSpan={3}>
+                        <div className="flex items-center gap-2">
+                          <span>{driverName}</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {driverOrders.length} customer{driverOrders.length !== 1 ? 's' : ''}
+                          </Badge>
+                        </div>
+                      </TableCell>
+                      <TableCell className="border-r text-center text-xs font-bold text-slate-600">
+                        Driver Total
+                      </TableCell>
+                      <TableCell className="text-center border-r hidden sm:table-cell">
+                        <div className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-red-800 bg-red-200 rounded">
+                          {driverOrders.reduce((sum, order) => sum + order.nonVegCount, 0)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center border-r hidden sm:table-cell">
+                        <div className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-green-800 bg-green-200 rounded">
+                          {driverOrders.reduce((sum, order) => sum + order.vegCount, 0)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-blue-800 bg-blue-200 rounded">
+                          {driverOrders.reduce((sum, order) => sum + order.totalCount, 0)}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                    {/* Customer Rows for this Driver */}
+                    {driverOrders.map((row, index) => (
+                      <TableRow key={row.customerId} className="hover:bg-slate-50/50 border-b">
+                        {/* Row Number */}
+                        <TableCell className="text-center text-xs text-muted-foreground font-mono border-r bg-slate-50/30">
+                          {index + 1}
+                        </TableCell>
+
+                        {/* Customer Name */}
+                        <TableCell className="font-medium text-sm border-r">
+                          <div className="truncate" title={row.customerName}>
+                            {row.customerName}
+                          </div>
+                        </TableCell>
+
+                        {/* Driver Name - Hidden in grouped view */}
+                        <TableCell className="text-xs text-muted-foreground border-r hidden md:table-cell">
+                          <div className="text-xs text-slate-400 italic">
+                            {/* Empty or minimal indicator since grouped by driver */}
+                            —
+                          </div>
+                        </TableCell>
+
+                        {/* Category Name */}
+                        <TableCell className="border-r hidden md:table-cell">
+                          <div className="text-xs bg-slate-100 px-2 py-1 rounded text-slate-700 truncate" title={row.categoryName}>
+                            {row.categoryName}
+                          </div>
+                        </TableCell>
+
+                        {/* Bag Format - Editable */}
+                        <TableCell className="border-r p-1">
+                          <Input
+                            value={row.bagFormat}
+                            onChange={(e) => handleBagFormatChange(row.customerId, e.target.value)}
+                            className="h-8 text-xs font-mono border-slate-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-200 bg-white"
+                            placeholder="e.g., 5,5+7"
+                          />
+                        </TableCell>
+
+                        {/* Non-Veg Count - Read Only */}
+                        <TableCell className="text-center border-r hidden sm:table-cell">
+                          <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-red-700 bg-red-100 rounded">
+                            {row.nonVegCount}
+                          </div>
+                        </TableCell>
+
+                        {/* Veg Count - Read Only */}
+                        <TableCell className="text-center border-r hidden sm:table-cell">
+                          <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-green-700 bg-green-100 rounded">
+                            {row.vegCount}
+                          </div>
+                        </TableCell>
+
+                        {/* Total Count - Read Only */}
+                        <TableCell className="text-center">
+                          <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-orange-700 bg-orange-100 rounded">
+                            {row.totalCount}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </React.Fragment>
+                ))
               ) : (
-                data.map((row, index) => (
-                  <TableRow key={row.customerId} className="hover:bg-slate-50/50 border-b">
-                    {/* Row Number */}
-                    <TableCell className="text-center text-xs text-muted-foreground font-mono border-r bg-slate-50/30">
-                      {index + 1}
-                    </TableCell>
-
-                    {/* Customer Name */}
-                    <TableCell className="font-medium text-sm border-r">
-                      <div className="truncate" title={row.customerName}>
-                        {row.customerName}
-                      </div>
-                    </TableCell>
-
-                    {/* Driver Name */}
-                    <TableCell className="text-xs text-muted-foreground border-r hidden md:table-cell">
-                      <div className="truncate" title={row.driverName}>
-                        {row.driverName}
-                      </div>
-                    </TableCell>
-
-                    {/* Category Name */}
-                    <TableCell className="border-r hidden md:table-cell">
-                      <div className="text-xs bg-slate-100 px-2 py-1 rounded text-slate-700 truncate" title={row.categoryName}>
-                        {row.categoryName}
-                      </div>
-                    </TableCell>
-
-                    {/* Bag Format - Editable */}
-                    <TableCell className="border-r p-1">
-                      <Input
-                        value={row.bagFormat}
-                        onChange={(e) => handleBagFormatChange(row.customerId, e.target.value)}
-                        className="h-8 text-xs font-mono border-slate-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-200 bg-white"
-                        placeholder="e.g., 5,5+7"
-                      />
-                    </TableCell>
-
-                    {/* Non-Veg Count - Read Only */}
-                    <TableCell className="text-center border-r hidden sm:table-cell">
-                      <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-red-700 bg-red-100 rounded">
-                        {row.nonVegCount}
-                      </div>
-                    </TableCell>
-
-                    {/* Veg Count - Read Only */}
-                    <TableCell className="text-center border-r hidden sm:table-cell">
-                      <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-green-700 bg-green-100 rounded">
-                        {row.vegCount}
-                      </div>
-                    </TableCell>
-
-                    {/* Total Count - Read Only */}
-                    <TableCell className="text-center">
-                      <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-orange-700 bg-orange-100 rounded">
-                        {row.totalCount}
-                      </div>
+                /* Ungrouped View */
+                data.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      No customers found for lunch orders
                     </TableCell>
                   </TableRow>
-                ))
+                ) : (
+                  data.map((row, index) => (
+                    <TableRow key={row.customerId} className="hover:bg-slate-50/50 border-b">
+                      {/* Row Number */}
+                      <TableCell className="text-center text-xs text-muted-foreground font-mono border-r bg-slate-50/30">
+                        {index + 1}
+                      </TableCell>
+
+                      {/* Customer Name */}
+                      <TableCell className="font-medium text-sm border-r">
+                        <div className="truncate" title={row.customerName}>
+                          {row.customerName}
+                        </div>
+                      </TableCell>
+
+                      {/* Driver Name */}
+                      <TableCell className="text-xs text-muted-foreground border-r hidden md:table-cell">
+                        <div className="truncate" title={row.driverName}>
+                          {row.driverName}
+                        </div>
+                      </TableCell>
+
+                      {/* Category Name */}
+                      <TableCell className="border-r hidden md:table-cell">
+                        <div className="text-xs bg-slate-100 px-2 py-1 rounded text-slate-700 truncate" title={row.categoryName}>
+                          {row.categoryName}
+                        </div>
+                      </TableCell>
+
+                      {/* Bag Format - Editable */}
+                      <TableCell className="border-r p-1">
+                        <Input
+                          value={row.bagFormat}
+                          onChange={(e) => handleBagFormatChange(row.customerId, e.target.value)}
+                          className="h-8 text-xs font-mono border-slate-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-200 bg-white"
+                          placeholder="e.g., 5,5+7"
+                        />
+                      </TableCell>
+
+                      {/* Non-Veg Count - Read Only */}
+                      <TableCell className="text-center border-r hidden sm:table-cell">
+                        <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-red-700 bg-red-100 rounded">
+                          {row.nonVegCount}
+                        </div>
+                      </TableCell>
+
+                      {/* Veg Count - Read Only */}
+                      <TableCell className="text-center border-r hidden sm:table-cell">
+                        <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-green-700 bg-green-100 rounded">
+                          {row.vegCount}
+                        </div>
+                      </TableCell>
+
+                      {/* Total Count - Read Only */}
+                      <TableCell className="text-center">
+                        <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-bold text-orange-700 bg-orange-100 rounded">
+                          {row.totalCount}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )
               )}
             </TableBody>
           </Table>
@@ -165,7 +299,7 @@ export function LunchOrdersTable({
               <TableRow className="bg-orange-50 hover:bg-orange-50 border-b font-semibold">
                 <TableCell className="text-center text-xs border-r bg-slate-100">∑</TableCell>
                 <TableCell className="font-bold text-sm border-r">
-                  TOTALS ({data.length} customers)
+                  GRAND TOTAL ({data.length} customers{groupByDriver ? `, ${Object.keys(groupedData).length} drivers` : ''})
                 </TableCell>
                 <TableCell className="border-r hidden md:table-cell"></TableCell>
                 <TableCell className="border-r hidden md:table-cell"></TableCell>
