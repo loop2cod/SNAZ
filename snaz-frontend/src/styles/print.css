@@ -1,0 +1,190 @@
+/* Print Styles for Tally-Style Bills */
+@media print {
+  /* Hide elements that shouldn't print */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Ensure proper page layout */
+  @page {
+    margin: 0.5in;
+    size: A4;
+  }
+
+  /* Reset body styles for print */
+  body {
+    font-family: 'Times New Roman', serif !important;
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+    color: black !important;
+    background: white !important;
+  }
+
+  /* Ensure proper text rendering */
+  * {
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  /* Page breaks */
+  .print\:break-before {
+    page-break-before: always !important;
+  }
+
+  .print\:break-after {
+    page-break-after: always !important;
+  }
+
+  .print\:break-inside-avoid {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Multi-page layout */
+  .bill-footer {
+    position: fixed !important;
+    bottom: 0.5in !important;
+    left: 0.5in !important;
+    right: 0.5in !important;
+    width: auto !important;
+  }
+
+  /* Ensure content doesn't overlap with fixed footer */
+  .bill-content {
+    margin-bottom: 120px !important; /* Space for footer */
+  }
+
+  /* Keep tables together when possible */
+  table {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Allow table rows to break if needed */
+  table tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* For very long tables, allow tbody to break */
+  table tbody {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  /* Remove shadows and borders that don't print well */
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  .print\:border-0 {
+    border: none !important;
+  }
+
+  /* Table styles for print */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    text-align: left !important;
+  }
+
+  th {
+    background-color: #f5f5f5 !important;
+    font-weight: bold !important;
+  }
+
+  /* Header styles */
+  h1, h2, h3, h4, h5, h6 {
+    color: black !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Ensure proper spacing */
+  .print\:p-6 {
+    padding: 1.5rem !important;
+  }
+
+  /* Remove unnecessary margins */
+  .print\:m-0 {
+    margin: 0 !important;
+  }
+
+  /* Flexbox fixes for print */
+  .flex:not(.bill-content) {
+    display: block !important;
+  }
+
+  .grid {
+    display: block !important;
+  }
+
+  /* Keep bill content as flex for proper footer positioning */
+  .bill-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Responsive grid to single column for print */
+  .grid-cols-1,
+  .grid-cols-2,
+  .md\:grid-cols-2 {
+    display: block !important;
+  }
+
+  .md\:grid-cols-2 > * {
+    width: 100% !important;
+    float: left !important;
+    clear: left !important;
+  }
+
+  /* Ensure images don't break layout */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Background colors for print */
+  .bg-gray-50,
+  .bg-gray-100 {
+    background-color: #f8f9fa !important;
+  }
+
+  .bg-yellow-50 {
+    background-color: #fffbeb !important;
+  }
+
+  /* Text colors for print */
+  .text-red-600 {
+    color: #dc2626 !important;
+  }
+
+  .text-green-600 {
+    color: #16a34a !important;
+  }
+
+  .text-gray-600 {
+    color: #4b5563 !important;
+  }
+
+  .text-gray-800 {
+    color: #1f2937 !important;
+  }
+
+  /* Border colors for print */
+  .border-gray-200 {
+    border-color: #e5e7eb !important;
+  }
+
+  .border-gray-300 {
+    border-color: #d1d5db !important;
+  }
+
+  .border-gray-800 {
+    border-color: #1f2937 !important;
+  }
+}

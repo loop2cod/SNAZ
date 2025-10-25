@@ -129,7 +129,14 @@ export default function BillsPage() {
               <tbody>
                 {bills.map(b => (
                   <tr key={b._id} className="border-b">
-                    <td className="py-2 font-medium">{b.number}</td>
+                    <td className="py-2 font-medium">
+                      <Link 
+                        href={`/bills/${b._id}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {b.number}
+                      </Link>
+                    </td>
                     <td className="py-2 capitalize">{b.entityType}</td>
                     <td className="py-2">
                       <Link 
