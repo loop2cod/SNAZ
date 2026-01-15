@@ -25,6 +25,11 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: 'SNAZ Backend API' });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -40,6 +45,7 @@ import dailyOrderRoutes from './routes/dailyOrderRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
 import billingRoutes from './routes/billingRoutes';
 import paymentRoutes from './routes/paymentRoutes';
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/drivers', driverRoutes);
