@@ -43,12 +43,10 @@ const CustomerPackageSchema: Schema = new Schema({
 const DailyFoodSchema: Schema = new Schema({
   lunch: {
     type: String,
-    required: true,
     trim: true
   },
   dinner: {
     type: String,
-    required: true,
     trim: true
   }
 });

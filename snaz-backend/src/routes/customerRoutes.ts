@@ -17,7 +17,7 @@ const validateCustomer = [
   body('packages.*.unitPrice').isFloat({ min: 0 }).withMessage('Unit price must be a positive number'),
   body('billingType').optional().isIn(['individual', 'company']).withMessage('Billing type must be individual or company'),
   body('startDate').isISO8601().withMessage('Valid start date is required'),
-  body('endDate').optional({ values: 'falsy' }).isISO8601().withMessage('Valid end date is required')
+  body('endDate').optional({ checkFalsy: true }).isISO8601().withMessage('Valid end date is required')
 ];
 
 // Routes
